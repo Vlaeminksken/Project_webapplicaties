@@ -1,0 +1,40 @@
+project/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/    # Logica voor API-endpoints
+│   │   ├── models/         # Database schema's
+│   │   ├── routes/         # Route-definities
+│   │   ├── middleware/     # Authenticatie en andere middleware
+│   │   ├── utils/          # Hulpfuncties
+│   │   └── app.js          # Startpunt van de applicatie
+│   ├── tests/              # Unit- en integratietests voor backend
+│   ├── config/             # Configuratiebestanden (bijv. database-connectie)
+│   └── package.json        # Backend afhankelijkheden en scripts
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # React-componenten
+│   │   ├── pages/          # Pagina-indelingen
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── styles/         # CSS-bestanden (of SCSS)
+│   │   ├── utils/          # Hulpfuncties (bijv. API-calls)
+│   │   └── App.js          # Startpunt van de front-end
+│   ├── public/             # Statistische bestanden (bijv. afbeeldingen)
+│   ├── tests/              # Unit- en integratietests voor frontend
+│   └── package.json        # Frontend afhankelijkheden en scripts
+│
+├── docker/
+│   ├── Dockerfile.backend  # Dockerfile voor backend
+│   ├── Dockerfile.frontend # Dockerfile voor frontend
+│   └── docker-compose.yml  # Voor het opzetten van de volledige applicatie
+│
+├── database/
+│   ├── migrations/         # Database migratiebestanden
+│   ├── seeders/            # Data voor het vullen van de database
+│   └── schema.sql          # Database schema (indien SQL gebruikt)
+│
+├── .gitignore              # Bestanden om uit Git te houden (zoals node_modules)
+├── README.md               # Uitleg over het project
+└── rapport.pdf             # Rapport dat bij de taak hoort
+
+
