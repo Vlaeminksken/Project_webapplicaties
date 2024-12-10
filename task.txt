@@ -1,0 +1,72 @@
+te kunnen: BACKEND 
+--------------------------------------
+Je maakt de relevante API endpoints om een gebruiker 
+te registreren, 
+in te loggen,
+nieuwe projecten aan te maken, 
+mensen en taken toe te voegen aan projecten,
+de ’status’ van taken te veranderen (i.e. dringend, compleet, ...), 
+om mensen in het project toe te wijzen aan taken, 
+en andere zaken die je nodig of relevant acht. 
+
+Er zijn twee soorten gebruikers per project: normaal en administrator. 
+De administrator:
+    kan taken toevoegen, toewijzen, en de status ervan veranderen.
+
+Een normale gebruiker:
+    kan alleen taken waaraan die is toegewezen aanpassen.
+ 
+Je zal op een manier de data die nodig is voor de applicatie te laten werken
+moeten bijhouden. 
+- database, maar de data moet beschikbaar zijn via een RESTful API. 
+
+je zorgen voor de gepaste authenticatie en
+security
+
+te kunnen: FRONTEND  
+--------------------------------------
+ De front-end moet toelaten je: 
+ - te registreren als gebruiker, 
+ -in te loggen, 
+ -nieuwe projecten, of taken aan te maken, 
+ -algemeen op het takenmanagement systeem te bekijken. 
+ 
+ Het dient gemaakt te worden met React, dus het gebruiken
+ en hergebruiken van React componenten is verplicht. 
+ 
+ Zorg voor toegang tot voldoende informatie, zoals profielen voor gebruikers met hun gegevens: 
+ - welke projecten ze hebben gemaakt, 
+ - welke projecten ze lid van zijn, 
+ - hoeveel taken ze zijn toegewezen, etc. 
+ 
+ Ook bij taken en projecten zelf dient hetvolgende weergegeven te worden: \
+ - titel 
+ -zoals bijvoorbeeld ook wanneer het is aangemaakt
+ -door wie
+ -een beschrijving. 
+ - In kort, ga ver genoeg met weergeven van informatie en interactiviteit. 
+ 
+ Algemene opmaak : 
+ - rekening houden met ’responsiveness’ van de front-end, 
+- goed uitzien op zowel desktop als mobile. 
+
+Maak voldoende gebruik van CSS om de website er
+ degelijk uit te laten zien, best door gebruik te maken van CSS frameworks zoals
+ Bootstrap.
+
+
+EXTRA 
+--------------------------------------
+ 4.1 Kleine vereisten
+ • Gebruik maken van git gedurende heel project
+ • Applicaties deployen gebruik makende van docker
+ • Genereer API documentatie
+ • Markdown support bij maken taken (gebruik Quill, Draft.js)
+ • Filteren en sorteren van takenlijst op bepaalde criteria.
+ 
+4.1.1 Grote vereisten
+ • Data persistentie met database
+ • Gebruiker profiel persoonlijk aanpassen (geef voldoende features)
+ • Integratie met een third-party application (zoals social media sharing,
+ OAuth, ...)
+ • ‘Tags‘ aanmaken per project die aan taken kunnen worden toegewezen.
