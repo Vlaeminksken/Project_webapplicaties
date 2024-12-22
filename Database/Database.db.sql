@@ -1,0 +1,58 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "PROJECTS" (
+	"id"	INTEGER,
+	"name"	TEXT NOT NULL,
+	"description"	TEXT,
+	"created_by"	INTEGER,
+	"created_at"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("created_by") REFERENCES "USERS"("id")
+);
+CREATE TABLE IF NOT EXISTS "PROJECT_MEMBERS" (
+	"id"	INTEGER,
+	"user_id"	INTEGER,
+	"project_id"	INTEGER,
+	"role"	TEXT NOT NULL,
+	"joined"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("project_id") REFERENCES "PROJECTS"("id"),
+	FOREIGN KEY("user_id") REFERENCES "USERS"("id")
+);
+CREATE TABLE IF NOT EXISTS "TAGS" (
+	"id"	INTEGER,
+	"name"	TEXT NOT NULL UNIQUE,
+	"created_at"	TEXT NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "TASKS" (
+	"id"	INTEGER,
+	"project_id"	INTEGER,
+	"title"	TEXT NOT NULL,
+	"description"	TEXT NOT NULL,
+	"status"	TEXT,
+	"assigned_to"	INTEGER,
+	"due_date"	TEXT,
+	"created_at"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("assigned_to") REFERENCES "USERS"("id"),
+	FOREIGN KEY("project_id") REFERENCES "PROJECT_MEMBERS"("project_id")
+);
+CREATE TABLE IF NOT EXISTS "TASK_TAGS" (
+	"id"	INTEGER,
+	"task_id"	INTEGER,
+	"tag_id"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("tag_id") REFERENCES "TAGS"("id"),
+	FOREIGN KEY("task_id") REFERENCES "TASKS"("id")
+);
+CREATE TABLE IF NOT EXISTS "USERS" (
+	"id"	INTEGER,
+	"name"	TEXT NOT NULL,
+	"email"	TEXT NOT NULL UNIQUE,
+	"password"	TEXT NOT NULL,
+	"role"	TEXT NOT NULL,
+	"created_at"	TEXT NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("id") REFERENCES ""
+);
+COMMIT;
