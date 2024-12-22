@@ -13,16 +13,18 @@ function Login({ setNotification }) {
         const response = await fetch('http://localhost:5000/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: username, password }), // name in plaats van username
+            body: JSON.stringify({ name: username, password }),
         });
     
         const data = await response.json();
         setNotification(data.message);
     
         if (response.ok) {
+            localStorage.setItem('token', data.token); // Token opslaan
             navigate('/home');
         }
     };
+    
     
     
 
