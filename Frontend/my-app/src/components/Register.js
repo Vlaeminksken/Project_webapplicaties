@@ -8,18 +8,23 @@ function Register({ setNotification }) {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        console.log("Registering with:", { username, email, password });
-
-        // Simuleer succesvolle registratie
-        if (username && email && password) {
-            setNotification('Je registratie is succesvol!');
-            navigate('/'); // Navigeer terug naar login
-        } else {
-            setNotification('Vul alle velden in om te registreren.');
+    
+        const response = await fetch('http://localhost:5000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: username, email, password }), // name in plaats van username
+        });
+    
+        const data = await response.json();
+        setNotification(data.message);
+    
+        if (response.ok) {
+            navigate('/');
         }
     };
+    
 
     return (
         <div className="container">

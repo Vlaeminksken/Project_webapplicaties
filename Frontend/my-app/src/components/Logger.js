@@ -7,17 +7,24 @@ function Login({ setNotification }) {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Logging in with:", { username, password });
-
-        // Simuleer succesvolle login
-        if (username && password) {
-            navigate('/home'); // Navigeer naar de homepagina
-        } else {
-            setNotification('Vul alle velden in om in te loggen.');
+    
+        const response = await fetch('http://localhost:5000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: username, password }), // name in plaats van username
+        });
+    
+        const data = await response.json();
+        setNotification(data.message);
+    
+        if (response.ok) {
+            navigate('/home');
         }
     };
+    
+    
 
     return (
         <div className="container">
