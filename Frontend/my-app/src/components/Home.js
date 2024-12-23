@@ -75,7 +75,7 @@ function Home() {
             {/* Sidebar */}
             <div className="sidebar">
                 <button onClick={handleLogout}>Log Out</button>
-                <button onClick={() => alert('Profiel functie wordt later toegevoegd.')}>Profiel</button>
+                <button onClick={() => navigate('/profile')}>Profiel</button>
                 <button onClick={() => alert('Toegewezen aan mij functie wordt later toegevoegd.')}>Toegewezen aan mij</button>
                 <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
             </div>

@@ -4,6 +4,7 @@ import Login from './components/Logger';
 import Register from './components/Register';
 import Home from './components/Home';
 import AddTask from './components/AddTasks';
+import Profile from './components/Profile';
 
 function App() {
     const [notification, setNotification] = useState('');
@@ -25,6 +26,7 @@ function App() {
                         path="/register"
                         element={<Register setNotification={setNotification} />}
                     />
+                    <Route path="/profile" element={<Profile />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/add-task" element={<AddTask />} />
                 </Routes>

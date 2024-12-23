@@ -30,11 +30,12 @@ function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
     if (!token) return res.status(401).json({ message: 'Geen token verstrekt!' });
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
+    jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) return res.status(403).json({ message: 'Token ongeldig!' });
-        req.user = user;
+        req.user = { id: decoded.id }; // Alleen het gebruikers-ID wordt gebruikt
         next();
     });
+    
 }
 
 // Endpoints
@@ -169,6 +170,31 @@ app.put('/tasks/:id', authenticateToken, (req, res) => {
     });
 });
 
+// Profiel gegevens ophalen
+app.get('/profile', authenticateToken, (req, res) => {
+    const query = 'SELECT name, email, created_at FROM USERS WHERE id = ?';
+
+    db.get(query, [req.user.id], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van profielgegevens!' });
+        }
+
+        if (row) {
+            const queryTasks = 'SELECT title FROM TASKS WHERE assigned_to = ?';
+            db.all(queryTasks, [req.user.id], (err, tasks) => {
+                if (err) {
+                    console.error(err.message);
+                    return res.status(500).json({ message: 'Fout bij het ophalen van taken!' });
+                }
+
+                res.status(200).json({ user: row, tasks: tasks.map((task) => task.title) });
+            });
+        } else {
+            res.status(404).json({ message: 'Gebruiker niet gevonden!' });
+        }
+    });
+});
 
 
 
