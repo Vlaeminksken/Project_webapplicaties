@@ -65,93 +65,100 @@ function Home() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>My Tasks</h1>
-            <button
-                style={{
-                    position: 'fixed',
-                    bottom: '20px',
-                    right: '20px',
-                    borderRadius: '50%',
-                    width: '50px',
-                    height: '50px',
-                    fontSize: '24px',
-                    backgroundColor: '#007bff',
-                    color: '#fff',
-                    border: 'none',
-                }}
-                onClick={() => navigate('/add-task')}
-            >
-                +
-            </button>
-            <ul className="task-list">
-                {tasks.map((task) => (
-                    <li
-                        key={task.id}
-                        className="task-item"
-                        onClick={() => openEditPanel(task)}
-                    >
-                        <input type="checkbox" className="task-checkbox" />
-                        <div>
-                            <h3>{task.title}</h3>
-                            <p>{task.description}</p>
-                            <small>Deadline: {task.due_date || 'Geen'}</small>
+        <div className="home-container">
+            {/* Sidebar */}
+            <div className="sidebar">
+                <button onClick={() => alert('Log out functie wordt later toegevoegd.')}>Log Out</button>
+                <button onClick={() => alert('Profiel functie wordt later toegevoegd.')}>Profiel</button>
+                <button onClick={() => alert('Toegewezen aan mij functie wordt later toegevoegd.')}>Toegewezen aan mij</button>
+                <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
+            </div>
+
+            {/* Main Content */}
+            <div className="main-content">
+                <h1>My Tasks</h1>
+                <button
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        borderRadius: '50%',
+                        width: '50px',
+                        height: '50px',
+                        fontSize: '24px',
+                        backgroundColor: '#007bff',
+                        color: '#fff',
+                        border: 'none',
+                    }}
+                    onClick={() => navigate('/add-task')}
+                >
+                    +
+                </button>
+                <ul className="task-list">
+                    {tasks.map((task) => (
+                        <li key={task.id} className="task-item" onClick={() => openEditPanel(task)}>
+                            <input type="checkbox" className="task-checkbox" />
+                            <div>
+                                <h3>{task.title}</h3>
+                                <p>{task.description}</p>
+                                <small>Deadline: {task.due_date || 'Geen'}</small>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+
+                {isEditing && (
+                    <>
+                        <div className="overlay open" onClick={closeEditPanel}></div>
+                        <div className={`edit-panel open`}>
+                            <h2>Taak Bewerken</h2>
+                            <form>
+                                <label>Titel:</label>
+                                <input
+                                    type="text"
+                                    value={selectedTask.title}
+                                    onChange={(e) =>
+                                        setSelectedTask({ ...selectedTask, title: e.target.value })
+                                    }
+                                    placeholder="Titel invoeren"
+                                />
+
+                                <label>Beschrijving:</label>
+                                <textarea
+                                    value={selectedTask.description}
+                                    onChange={(e) =>
+                                        setSelectedTask({
+                                            ...selectedTask,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                    placeholder="Beschrijving invoeren"
+                                />
+
+                                <label>Deadline:</label>
+                                <input
+                                    type="date"
+                                    value={selectedTask.due_date}
+                                    onChange={(e) =>
+                                        setSelectedTask({ ...selectedTask, due_date: e.target.value })
+                                    }
+                                />
+
+                                <button type="button" onClick={handleSaveChanges}>
+                                    Opslaan
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={closeEditPanel}
+                                    className="cancel-button"
+                                >
+                                    Annuleren
+                                </button>
+                            </form>
                         </div>
-                    </li>
-                ))}
-            </ul>
-
-             {isEditing && (
-                <>
-                    <div className="overlay open" onClick={closeEditPanel}></div>
-                    <div className={`edit-panel open`}>
-                        <h2>Taak Bewerken</h2>
-                        <form>
-                            <label>Titel:</label>
-                            <input
-                                type="text"
-                                value={selectedTask.title}
-                                onChange={(e) =>
-                                    setSelectedTask({ ...selectedTask, title: e.target.value })
-                                }
-                                placeholder="Titel invoeren"
-                            />
-
-                            <label>Beschrijving:</label>
-                            <textarea
-                                value={selectedTask.description}
-                                onChange={(e) =>
-                                    setSelectedTask({
-                                        ...selectedTask,
-                                        description: e.target.value,
-                                    })
-                                }
-                                placeholder="Beschrijving invoeren"
-                            />
-
-                            <label>Deadline:</label>
-                            <input
-                                type="date"
-                                value={selectedTask.due_date}
-                                onChange={(e) =>
-                                    setSelectedTask({ ...selectedTask, due_date: e.target.value })
-                                }
-                            />
-
-                            <button type="button" onClick={handleSaveChanges}>
-                                Opslaan
-                            </button>
-                            <button
-                                type="button"
-                                onClick={closeEditPanel}
-                                className="cancel-button"
-                            >
-                                Annuleren
-                            </button>
-                        </form>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }
