@@ -146,6 +146,29 @@ app.get('/tasks', authenticateToken, (req, res) => {
     });
 });
 
+// Taak bijwerken
+app.put('/tasks/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { title, description, due_date } = req.body;
+
+    if (!title || !description) {
+        return res.status(400).json({ message: 'Titel en beschrijving zijn verplicht!' });
+    }
+
+    const query = `
+        UPDATE TASKS 
+        SET title = ?, description = ?, due_date = ?
+        WHERE id = ?`;
+
+    db.run(query, [title, description, due_date, id], function (err) {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Bijwerken mislukt!' });
+        }
+        res.status(200).json({ message: 'Taak succesvol bijgewerkt!' });
+    });
+});
+
 
 
 

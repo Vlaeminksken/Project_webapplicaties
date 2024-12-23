@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 function Home() {
     const [tasks, setTasks] = useState([]);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,6 +27,43 @@ function Home() {
             });
     }, [navigate]);
 
+    const openEditPanel = (task) => {
+        setSelectedTask(task);
+        setIsEditing(true);
+    };
+
+    const closeEditPanel = () => {
+        setIsEditing(false);
+        setSelectedTask(null);
+    };
+
+    const handleSaveChanges = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/');
+            return;
+        }
+
+        const response = await fetch(`http://localhost:5000/tasks/${selectedTask.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: token,
+            },
+            body: JSON.stringify(selectedTask),
+        });
+
+        if (response.ok) {
+            const updatedTasks = tasks.map((task) =>
+                task.id === selectedTask.id ? selectedTask : task
+            );
+            setTasks(updatedTasks);
+            closeEditPanel();
+        } else {
+            alert('Fout bij het opslaan van wijzigingen!');
+        }
+    };
+
     return (
         <div style={{ padding: '20px' }}>
             <h1>My Tasks</h1>
@@ -45,15 +84,74 @@ function Home() {
             >
                 +
             </button>
-            <ul>
+            <ul className="task-list">
                 {tasks.map((task) => (
-                    <li key={task.id}>
-                        <h3>{task.title}</h3>
-                        <p>{task.description}</p>
-                        <small>Deadline: {task.due_date || 'Geen'}</small>
+                    <li
+                        key={task.id}
+                        className="task-item"
+                        onClick={() => openEditPanel(task)}
+                    >
+                        <input type="checkbox" className="task-checkbox" />
+                        <div>
+                            <h3>{task.title}</h3>
+                            <p>{task.description}</p>
+                            <small>Deadline: {task.due_date || 'Geen'}</small>
+                        </div>
                     </li>
                 ))}
             </ul>
+
+             {isEditing && (
+                <>
+                    <div className="overlay open" onClick={closeEditPanel}></div>
+                    <div className={`edit-panel open`}>
+                        <h2>Taak Bewerken</h2>
+                        <form>
+                            <label>Titel:</label>
+                            <input
+                                type="text"
+                                value={selectedTask.title}
+                                onChange={(e) =>
+                                    setSelectedTask({ ...selectedTask, title: e.target.value })
+                                }
+                                placeholder="Titel invoeren"
+                            />
+
+                            <label>Beschrijving:</label>
+                            <textarea
+                                value={selectedTask.description}
+                                onChange={(e) =>
+                                    setSelectedTask({
+                                        ...selectedTask,
+                                        description: e.target.value,
+                                    })
+                                }
+                                placeholder="Beschrijving invoeren"
+                            />
+
+                            <label>Deadline:</label>
+                            <input
+                                type="date"
+                                value={selectedTask.due_date}
+                                onChange={(e) =>
+                                    setSelectedTask({ ...selectedTask, due_date: e.target.value })
+                                }
+                            />
+
+                            <button type="button" onClick={handleSaveChanges}>
+                                Opslaan
+                            </button>
+                            <button
+                                type="button"
+                                onClick={closeEditPanel}
+                                className="cancel-button"
+                            >
+                                Annuleren
+                            </button>
+                        </form>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
