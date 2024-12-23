@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import Login from './components/Logger';
 import Register from './components/Register';
 import Home from './components/Home';
+import AddTask from './components/AddTasks';
 
 function App() {
     const [notification, setNotification] = useState('');
@@ -25,6 +26,7 @@ function App() {
                         element={<Register setNotification={setNotification} />}
                     />
                     <Route path="/home" element={<Home />} />
+                    <Route path="/add-task" element={<AddTask />} />
                 </Routes>
             </div>
         </Router>

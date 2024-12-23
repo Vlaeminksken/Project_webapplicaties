@@ -108,3 +108,47 @@ app.get('/home', authenticateToken, (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Taak toevoegen
+app.post('/tasks', authenticateToken, (req, res) => {
+    const { title, description, due_date } = req.body;
+    const userId = req.user.id; // Gebruiker ID van de ingelogde gebruiker
+    const createdAt = new Date().toISOString();
+
+    if (!title || !description) {
+        return res.status(400).json({ message: 'Titel en beschrijving zijn verplicht!' });
+    }
+
+    const query = `
+        INSERT INTO TASKS (title, description, status, assigned_to, due_date, created_at) 
+        VALUES (?, ?, 'pending', ?, ?, ?)`;
+
+    db.run(query, [title, description, userId, due_date, createdAt], function (err) {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Taak toevoegen mislukt!' });
+        }
+        res.status(200).json({ message: 'Taak succesvol toegevoegd!' });
+    });
+});
+
+// Taken ophalen
+app.get('/tasks', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+
+    const query = 'SELECT * FROM TASKS WHERE assigned_to = ?';
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Taken ophalen mislukt!' });
+        }
+        res.status(200).json(rows);
+    });
+});
+
+
+
+
+
+
+
