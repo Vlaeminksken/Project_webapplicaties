@@ -64,11 +64,17 @@ function Home() {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Verwijdert het opgeslagen token
+        navigate('/'); // Navigeert naar de loginpagina
+    };
+    
+
     return (
         <div className="home-container">
             {/* Sidebar */}
             <div className="sidebar">
-                <button onClick={() => alert('Log out functie wordt later toegevoegd.')}>Log Out</button>
+                <button onClick={handleLogout}>Log Out</button>
                 <button onClick={() => alert('Profiel functie wordt later toegevoegd.')}>Profiel</button>
                 <button onClick={() => alert('Toegewezen aan mij functie wordt later toegevoegd.')}>Toegewezen aan mij</button>
                 <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
