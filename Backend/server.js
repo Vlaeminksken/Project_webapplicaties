@@ -209,6 +209,28 @@ app.get('/projects', authenticateToken, (req, res) => {
     });
 });
 
+app.post('/projects', authenticateToken, (req, res) => {
+    const { name, description } = req.body;
+    const createdBy = req.user.id;
+    const createdAt = new Date().toISOString();
+
+    if (!name) {
+        return res.status(400).json({ message: 'De projectnaam is verplicht!' });
+    }
+
+    const query = `
+        INSERT INTO PROJECTS (name, description, created_by, created_at)
+        VALUES (?, ?, ?, ?)`;
+
+    db.run(query, [name, description, createdBy, createdAt], function (err) {
+        if (err) {
+            console.error('Database fout bij project toevoegen:', err.message);
+            return res.status(500).json({ message: 'Project aanmaken mislukt!' });
+        }
+
+        res.status(201).json({ message: 'Project succesvol aangemaakt!', projectId: this.lastID });
+    });
+});
 
 
 

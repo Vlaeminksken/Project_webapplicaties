@@ -13,21 +13,36 @@ function Home() {
             navigate('/');
             return;
         }
-
+    
+        // Taken ophalen
         fetch('http://localhost:5000/tasks', {
             method: 'GET',
             headers: { Authorization: token },
         })
             .then((response) => response.json())
             .then((data) => {
-                setTasks(data);
-                setProjects(data);
+                setTasks(data); // Zet alleen de taken
             })
             .catch(() => {
+                console.error('Fout bij het ophalen van taken.');
                 navigate('/');
+            });
+    
+        // Projecten ophalen
+        fetch('http://localhost:5000/projects', {
+            method: 'GET',
+            headers: { Authorization: token },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setProjects(data); // Zet alleen de projecten
+            })
+            .catch(() => {
+                console.error('Fout bij het ophalen van projecten.');
                 setProjects([]);
             });
     }, [navigate]);
+    
 
     const openEditPanel = (task) => {
         setSelectedTask(task);
@@ -100,7 +115,6 @@ function Home() {
                     {/* Voeg project toe knop */}
                     <button
                         style={{
-                            marginTop: '20px',
                             padding: '10px',
                             borderRadius: '5px',
                             border: '1px solid #007bff',
@@ -108,10 +122,13 @@ function Home() {
                             color: '#fff',
                             width: '100%',
                             cursor: 'pointer',
+                            marginTop: '10px',
                         }}
+                        onClick={() => navigate('/add-project')}
                     >
                         Voeg project toe
                     </button>
+
                 </div>
    
         

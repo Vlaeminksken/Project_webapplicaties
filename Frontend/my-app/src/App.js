@@ -5,6 +5,7 @@ import Register from './components/Register';
 import Home from './components/Home';
 import AddTask from './components/AddTasks';
 import Profile from './components/Profile';
+import AddProject from './components/AddProject';
 
 function App() {
     const [notification, setNotification] = useState('');
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/add-task" element={<AddTask />} />
+                    <Route path="/add-project" element={<AddProject />} />
                 </Routes>
             </div>
         </Router>
