@@ -196,6 +196,18 @@ app.get('/profile', authenticateToken, (req, res) => {
     });
 });
 
+app.get('/projects', authenticateToken, (req, res) => {
+    const query = 'SELECT id, name, description FROM PROJECTS WHERE created_by = ?';
+
+    db.all(query, [req.user.id], (err, rows) => {
+        if (err) {
+            console.error('Database fout bij projecten ophalen:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van projecten.' });
+        }
+
+        res.status(200).json(rows || []); // Altijd een array retourneren, zelfs als er geen projecten zijn
+    });
+});
 
 
 

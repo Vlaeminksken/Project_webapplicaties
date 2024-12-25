@@ -21,9 +21,11 @@ function Home() {
             .then((response) => response.json())
             .then((data) => {
                 setTasks(data);
+                setProjects(data);
             })
             .catch(() => {
                 navigate('/');
+                setProjects([]);
             });
     }, [navigate]);
 
@@ -69,6 +71,7 @@ function Home() {
         navigate('/'); // Navigeert naar de loginpagina
     };
     
+    const [projects, setProjects] = useState([]);
 
     return (
         <div className="home-container">
@@ -79,6 +82,23 @@ function Home() {
                 <button onClick={() => alert('Toegewezen aan mij functie wordt later toegevoegd.')}>Toegewezen aan mij</button>
                 <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
                 <hr style={{ width: '100%', margin: '20px 0', borderColor: '#ddd' }} />
+            
+                <div>
+                    <h3>Mijn Projecten</h3>
+                    <ul style={{ listStyle: 'none', padding: 0, marginTop: '10px' }}>
+                        {projects.length > 0 ? (
+                            projects.map((project) => (
+                                <li key={project.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
+                                    <strong>{project.name}</strong>
+                                    <p>{project.description || 'Geen beschrijving'}</p>
+                                </li>
+                            ))
+                        ) : (
+                            <p>Geen projecten gevonden.</p>
+                        )}
+                    </ul>
+                </div>     
+        
             </div>
 
             {/* Main Content */}
