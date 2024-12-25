@@ -97,7 +97,23 @@ function Home() {
                             <p>Geen projecten gevonden.</p>
                         )}
                     </ul>
-                </div>     
+                    {/* Voeg project toe knop */}
+                    <button
+                        style={{
+                            marginTop: '20px',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            border: '1px solid #007bff',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            width: '100%',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Voeg project toe
+                    </button>
+                </div>
+   
         
             </div>
 
