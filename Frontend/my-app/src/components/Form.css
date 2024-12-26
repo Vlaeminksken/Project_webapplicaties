@@ -282,4 +282,39 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.vertical-dots-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+.vertical-dots-button:hover {
+    color: #007bff; /* Verander kleur bij hover */
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 10;
+}
+.dropdown-menu li {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.dropdown-menu li:last-child {
+    margin-bottom: 0;
+}
+.dropdown-menu li:hover {
+    background-color: #f0f0f0;
+}
 

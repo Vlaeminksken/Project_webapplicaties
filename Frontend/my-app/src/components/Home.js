@@ -105,6 +105,12 @@ function Home() {
         project.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen((prev) => !prev);
+    };
+    
     
     return (
         <div className="home-container">
@@ -176,6 +182,44 @@ function Home() {
 
             {/* Main Content */}
             <div className="main-content">
+            <div style={{ position: 'relative' }}>
+                <button
+                    onClick={toggleDropdown}
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    &#x22EE;
+                </button>
+                {isDropdownOpen && (
+                    <ul
+                        style={{
+                            position: 'absolute',
+                            top: '40px',
+                            right: '20px',
+                            listStyle: 'none',
+                            padding: '10px',
+                            margin: 0,
+                            backgroundColor: '#fff',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                            borderRadius: '5px',
+                            zIndex: 10,
+                        }}
+                    >
+                        <li style={{ marginBottom: '10px', cursor: 'pointer' }}>Bewerk project</li>
+                        <li style={{ marginBottom: '10px', cursor: 'pointer' }}>Verwijder project</li>
+                        <li style={{ cursor: 'pointer' }}>Voeg persoon toe</li>
+                    </ul>
+                )}
+            </div>
+
+
                 <h1>My Tasks</h1>
                 <button
                     style={{
