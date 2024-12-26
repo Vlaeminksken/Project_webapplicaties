@@ -44,16 +44,17 @@ function Home() {
             });
     }, [navigate]);
     
-
+    
     const openEditPanel = (task) => {
         setSelectedTask(task);
         setIsEditing(true);
     };
-
+    
     const closeEditPanel = () => {
-        setIsEditing(false);
         setSelectedTask(null);
+        setIsEditing(false);
     };
+    
 
     const handleSaveChanges = async () => {
         const token = localStorage.getItem('token');
@@ -157,29 +158,41 @@ function Home() {
             <div className="main-content">
                 <h1>My Tasks</h1>
                 <button
-    style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        borderRadius: '50%',
-        width: '50px',
-        height: '50px',
-        fontSize: '24px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-    }}
-    onClick={() => navigate('/add-task', { state: { projectId: selectedProject } })} // Geef projectId mee
->
-    +
-</button>
-
-
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        borderRadius: '50%',
+                        width: '50px',
+                        height: '50px',
+                        fontSize: '24px',
+                        backgroundColor: '#007bff',
+                        color: '#fff',
+                        border: 'none',
+                    }}
+                    onClick={() => navigate('/add-task', { state: { projectId: selectedProject } })} // Geef projectId mee
+                >
+                    +
+                </button>
                 <ul className="task-list">
                     {filteredTasks.length > 0 ? (
                         filteredTasks.map((task) => (
-                            <li key={task.id} className="task-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
-                                <input type="checkbox" />
+                            <li
+                                key={task.id}
+                                onClick={() => openEditPanel(task)} // Open bewerkingspaneel
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '15px',
+                                    marginBottom: '10px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '5px',
+                                    backgroundColor: '#f9f9f9',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <input type="checkbox" style={{ marginRight: '10px' }} />
                                 <div>
                                     <h3>{task.title}</h3>
                                     <p>{task.description}</p>
@@ -188,55 +201,89 @@ function Home() {
                             </li>
                         ))
                     ) : (
-                        <p>Geen taken gevonden voor dit project.</p>
+                        <p>Geen taken gevonden.</p>
                     )}
                 </ul>
-
-
                 {isEditing && (
                     <>
-                        <div className="overlay open" onClick={closeEditPanel}></div>
-                        <div className={`edit-panel open`}>
+                        <div
+                            className="overlay"
+                            onClick={closeEditPanel}
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                zIndex: 10,
+                            }}
+                        ></div>
+                        <div
+                            className="edit-panel"
+                            style={{
+                                position: 'fixed',
+                                top: '10%',
+                                right: '10%',
+                                width: '300px',
+                                padding: '20px',
+                                backgroundColor: '#fff',
+                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                zIndex: 11,
+                            }}
+                        >
                             <h2>Taak Bewerken</h2>
                             <form>
                                 <label>Titel:</label>
                                 <input
                                     type="text"
                                     value={selectedTask.title}
-                                    onChange={(e) =>
-                                        setSelectedTask({ ...selectedTask, title: e.target.value })
-                                    }
-                                    placeholder="Titel invoeren"
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
+                                    style={{ width: '100%', marginBottom: '10px' }}
                                 />
-
                                 <label>Beschrijving:</label>
                                 <textarea
                                     value={selectedTask.description}
                                     onChange={(e) =>
-                                        setSelectedTask({
-                                            ...selectedTask,
-                                            description: e.target.value,
-                                        })
+                                        setSelectedTask({ ...selectedTask, description: e.target.value })
                                     }
-                                    placeholder="Beschrijving invoeren"
+                                    style={{ width: '100%', marginBottom: '10px' }}
                                 />
-
                                 <label>Deadline:</label>
                                 <input
                                     type="date"
-                                    value={selectedTask.due_date}
+                                    value={selectedTask.due_date || ''}
                                     onChange={(e) =>
                                         setSelectedTask({ ...selectedTask, due_date: e.target.value })
                                     }
+                                    style={{ width: '100%', marginBottom: '10px' }}
                                 />
-
-                                <button type="button" onClick={handleSaveChanges}>
+                                <button
+                                    type="button"
+                                    onClick={handleSaveChanges} // Zorg dat de functie hier wordt aangeroepen
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        border: 'none',
+                                        backgroundColor: '#007bff',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        marginRight: '10px',
+                                    }}
+                                >
                                     Opslaan
                                 </button>
+
                                 <button
                                     type="button"
                                     onClick={closeEditPanel}
-                                    className="cancel-button"
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        border: 'none',
+                                        backgroundColor: '#6c757d',
+                                        color: '#fff',
+                                    }}
                                 >
                                     Annuleren
                                 </button>
@@ -244,6 +291,7 @@ function Home() {
                         </div>
                     </>
                 )}
+
             </div>
         </div>
     );

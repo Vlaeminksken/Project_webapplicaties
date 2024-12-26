@@ -149,7 +149,6 @@ app.get('/tasks', authenticateToken, (req, res) => {
     });
 });
 
-// Taak bijwerken
 app.put('/tasks/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
     const { title, description, due_date } = req.body;
@@ -165,12 +164,18 @@ app.put('/tasks/:id', authenticateToken, (req, res) => {
 
     db.run(query, [title, description, due_date, id], function (err) {
         if (err) {
-            console.error(err.message);
+            console.error('Fout bij het bijwerken van taak:', err.message);
             return res.status(500).json({ message: 'Bijwerken mislukt!' });
         }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Taak niet gevonden!' });
+        }
+
         res.status(200).json({ message: 'Taak succesvol bijgewerkt!' });
     });
 });
+
 
 // Profiel gegevens ophalen
 app.get('/profile', authenticateToken, (req, res) => {
