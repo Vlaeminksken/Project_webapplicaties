@@ -6,10 +6,16 @@ function Register({ setNotification }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setNotification('Wachtwoorden komen niet overeen. Probeer het opnieuw.');
+            return;
+        }
     
         const response = await fetch('http://localhost:5000/register', {
             method: 'POST',
@@ -24,7 +30,6 @@ function Register({ setNotification }) {
             navigate('/');
         }
     };
-    
 
     return (
         <div className="container">
@@ -60,6 +65,14 @@ function Register({ setNotification }) {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Kies een wachtwoord"
+                            required
+                        />
+                        <label>Bevestig Wachtwoord:</label>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Herhaal je wachtwoord"
                             required
                         />
                         <button type="submit">Registreer</button>
