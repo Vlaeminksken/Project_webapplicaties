@@ -287,6 +287,41 @@ function Home() {
                                 >
                                     Annuleren
                                 </button>
+                                <button
+                                type="button"
+                                onClick={async () => {
+                                    const token = localStorage.getItem('token');
+                                    const response = await fetch(`http://localhost:5000/tasks/${selectedTask.id}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            Authorization: token,
+                                        },
+                                    });
+
+                                    if (response.ok) {
+                                        setTasks((prevTasks) =>
+                                            prevTasks.filter((task) => task.id !== selectedTask.id)
+                                        );
+                                        setFilteredTasks((prevFilteredTasks) =>
+                                            prevFilteredTasks.filter((task) => task.id !== selectedTask.id)
+                                        );
+                                        closeEditPanel();
+                                    } else {
+                                        alert('Fout bij het verwijderen van de taak!');
+                                    }
+                                }}
+                                style={{
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    border: 'none',
+                                    backgroundColor: '#dc3545',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Verwijderen
+                            </button>
+
                             </form>
                         </div>
                     </>

@@ -71,6 +71,25 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.delete('/tasks/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    const query = 'DELETE FROM TASKS WHERE id = ?';
+    db.run(query, [id], function (err) {
+        if (err) {
+            console.error('Fout bij het verwijderen van taak:', err.message);
+            return res.status(500).json({ message: 'Fout bij het verwijderen van taak.' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Taak niet gevonden!' });
+        }
+
+        res.status(200).json({ message: 'Taak succesvol verwijderd!' });
+    });
+});
+
+
 // Inloggen
 app.post('/login', (req, res) => {
     const { name, password } = req.body;
@@ -132,6 +151,26 @@ app.post('/tasks', authenticateToken, (req, res) => {
         }
 
         res.status(201).json({ message: 'Taak succesvol toegevoegd!', taskId: this.lastID });
+    });
+});
+
+// Taak verwijderen
+app.delete('/tasks/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    const query = `DELETE FROM TASKS WHERE id = ?`;
+
+    db.run(query, [id], function (err) {
+        if (err) {
+            console.error('Fout bij het verwijderen van taak:', err.message);
+            return res.status(500).json({ message: 'Verwijderen mislukt!' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Taak niet gevonden!' });
+        }
+
+        res.status(200).json({ message: 'Taak succesvol verwijderd!' });
     });
 });
 
