@@ -88,6 +88,12 @@ function Home() {
     
     const [projects, setProjects] = useState([]);
 
+    const [selectedProject, setSelectedProject] = useState(null);
+    const handleSelectProject = (projectId) => {
+        setSelectedProject(projectId);
+    };
+    
+
     return (
         <div className="home-container">
             {/* Sidebar */}
@@ -101,16 +107,23 @@ function Home() {
                 <div>
                     <h3>Mijn Projecten</h3>
                     <ul style={{ listStyle: 'none', padding: 0, marginTop: '10px' }}>
-                        {projects.length > 0 ? (
-                            projects.map((project) => (
-                                <li key={project.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
-                                    <strong>{project.name}</strong>
-                                    <p>{project.description || 'Geen beschrijving'}</p>
-                                </li>
-                            ))
-                        ) : (
-                            <p>Geen projecten gevonden.</p>
-                        )}
+                        {projects.map((project) => (
+                            <li
+                                key={project.id}
+                                onClick={() => handleSelectProject(project.id)}
+                                style={{
+                                    marginBottom: '10px',
+                                    padding: '10px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '5px',
+                                    backgroundColor: selectedProject === project.id ? '#e0e0e0' : '#f9f9f9',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <strong>{project.name}</strong>
+                                <p>{project.description || 'Geen beschrijving'}</p>
+                            </li>
+                        ))}
                     </ul>
                     {/* Voeg project toe knop */}
                     <button
