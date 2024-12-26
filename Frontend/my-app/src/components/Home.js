@@ -21,7 +21,8 @@ function Home() {
         })
             .then((response) => response.json())
             .then((data) => {
-                setTasks(data); // Zet alleen de taken
+                setTasks(data);
+                setFilteredTasks(data); // Toon alle taken standaard
             })
             .catch(() => {
                 console.error('Fout bij het ophalen van taken.');
@@ -89,10 +90,15 @@ function Home() {
     const [projects, setProjects] = useState([]);
 
     const [selectedProject, setSelectedProject] = useState(null);
+
     const handleSelectProject = (projectId) => {
         setSelectedProject(projectId);
+        const tasksForProject = tasks.filter((task) => task.project_id === projectId);
+        setFilteredTasks(tasksForProject);
     };
     
+    const [filteredTasks, setFilteredTasks] = useState([]);
+
 
     return (
         <div className="home-container">
@@ -168,17 +174,22 @@ function Home() {
                     +
                 </button>
                 <ul className="task-list">
-                    {tasks.map((task) => (
-                        <li key={task.id} className="task-item" onClick={() => openEditPanel(task)}>
-                            <input type="checkbox" className="task-checkbox" />
-                            <div>
-                                <h3>{task.title}</h3>
-                                <p>{task.description}</p>
-                                <small>Deadline: {task.due_date || 'Geen'}</small>
-                            </div>
-                        </li>
-                    ))}
+                    {filteredTasks.length > 0 ? (
+                        filteredTasks.map((task) => (
+                            <li key={task.id} className="task-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
+                                <input type="checkbox" />
+                                <div>
+                                    <h3>{task.title}</h3>
+                                    <p>{task.description}</p>
+                                    <small>Deadline: {task.due_date || 'Geen'}</small>
+                                </div>
+                            </li>
+                        ))
+                    ) : (
+                        <p>Geen taken gevonden voor dit project.</p>
+                    )}
                 </ul>
+
 
                 {isEditing && (
                     <>
