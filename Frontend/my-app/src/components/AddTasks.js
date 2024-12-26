@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 function AddTasks() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [dueDate, setDueDate] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -25,7 +26,7 @@ function AddTasks() {
                 'Content-Type': 'application/json',
                 Authorization: token,
             },
-            body: JSON.stringify({ title, description, project_id: projectId }),
+            body: JSON.stringify({ title, description, due_date: dueDate, status: 'pending', project_id: projectId }),
         });
 
         const data = await response.json();
@@ -52,6 +53,14 @@ function AddTasks() {
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    required
+                    style={{ display: 'block', marginBottom: '10px', width: '100%', padding: '8px' }}
+                />
+                <label>Datum:</label>
+                <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
                     required
                     style={{ display: 'block', marginBottom: '10px', width: '100%', padding: '8px' }}
                 />
