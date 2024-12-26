@@ -280,6 +280,63 @@ app.post('/projects', authenticateToken, (req, res) => {
     });
 });
 
+app.put('/projects/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ message: 'De projectnaam is verplicht!' });
+    }
+
+    const query = `
+        UPDATE PROJECTS
+        SET name = ?, description = ?
+        WHERE id = ? AND created_by = ?`;
+
+    db.run(query, [name, description, id, req.user.id], function (err) {
+        if (err) {
+            console.error('Fout bij het bijwerken van project:', err.message);
+            return res.status(500).json({ message: 'Fout bij het bijwerken van project.' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Project niet gevonden.' });
+        }
+
+        res.status(200).json({ message: 'Project succesvol bijgewerkt!' });
+    });
+});
+
+app.get('/projects/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    console.log('Project ID ontvangen:', id);
+    console.log('User ID ontvangen:', req.user.id);
+
+    const query = `
+        SELECT id, name, description
+        FROM PROJECTS
+        WHERE id = ? AND created_by = ?`;
+
+    db.get(query, [id, req.user.id], (err, row) => {
+        if (err) {
+            console.error('Databasefout:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van projectgegevens.' });
+        }
+
+        if (!row) {
+            console.log('Geen project gevonden.');
+            return res.status(404).json({ message: 'Project niet gevonden.' });
+        }
+
+        console.log('Project gevonden:', row);
+        res.status(200).json(row);
+    });
+});
+
+
+
+
 
 
 

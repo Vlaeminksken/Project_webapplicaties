@@ -212,7 +212,19 @@ function Home() {
                             zIndex: 10,
                         }}
                     >
-                        <li style={{ marginBottom: '10px', cursor: 'pointer' }}>Bewerk project</li>
+                        <li
+    style={{ marginBottom: '10px', cursor: 'pointer' }}
+    onClick={() => {
+        if (selectedProject) {
+            navigate('/edit-project', { state: { projectId: selectedProject } });
+        } else {
+            alert('Selecteer eerst een project om te bewerken.');
+        }
+    }}
+>
+    Bewerk project
+</li>
+
                         <li style={{ marginBottom: '10px', cursor: 'pointer' }}>Verwijder project</li>
                         <li style={{ cursor: 'pointer' }}>Voeg persoon toe</li>
                     </ul>
