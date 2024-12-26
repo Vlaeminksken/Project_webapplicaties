@@ -26,7 +26,13 @@ function AddTasks() {
                 'Content-Type': 'application/json',
                 Authorization: token,
             },
-            body: JSON.stringify({ title, description, due_date: dueDate, status: 'pending', project_id: projectId }),
+            body: JSON.stringify({
+                title,
+                description,
+                due_date: dueDate,
+                status: 'pending', // Standaardwaarde voor status
+                project_id: projectId,
+            }),
         });
 
         const data = await response.json();
