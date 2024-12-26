@@ -112,26 +112,28 @@ app.listen(PORT, () => {
 
 // Taak toevoegen
 app.post('/tasks', authenticateToken, (req, res) => {
-    const { title, description, due_date } = req.body;
-    const userId = req.user.id; // Gebruiker ID van de ingelogde gebruiker
+    const { project_id, title, description, due_date } = req.body;
+    const assignedTo = req.user.id;
     const createdAt = new Date().toISOString();
 
-    if (!title || !description) {
-        return res.status(400).json({ message: 'Titel en beschrijving zijn verplicht!' });
+    if (!title || !description || !project_id) {
+        return res.status(400).json({ message: 'Titel, beschrijving en project_id zijn verplicht.' });
     }
 
     const query = `
-        INSERT INTO TASKS (title, description, status, assigned_to, due_date, created_at) 
-        VALUES (?, ?, 'pending', ?, ?, ?)`;
+        INSERT INTO TASKS (project_id, title, description, assigned_to, due_date, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)`;
 
-    db.run(query, [title, description, userId, due_date, createdAt], function (err) {
+    db.run(query, [project_id, title, description, assignedTo, due_date, createdAt], function (err) {
         if (err) {
-            console.error(err.message);
-            return res.status(500).json({ message: 'Taak toevoegen mislukt!' });
+            console.error('Database fout bij taak toevoegen:', err.message);
+            return res.status(500).json({ message: 'Fout bij het toevoegen van de taak.' });
         }
-        res.status(200).json({ message: 'Taak succesvol toegevoegd!' });
+
+        res.status(201).json({ message: 'Taak succesvol toegevoegd!', taskId: this.lastID });
     });
 });
+
 
 // Taken ophalen
 app.get('/tasks', authenticateToken, (req, res) => {

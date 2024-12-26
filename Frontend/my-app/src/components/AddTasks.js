@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-function AddTask() {
+function AddTasks() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [dueDate, setDueDate] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Haal het projectId op vanuit de locatie state
+    const projectId = location.state?.projectId || null;
 
     const handleAddTask = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
+
+        if (!projectId) {
+            alert('Geen project geselecteerd. Selecteer een project om een taak aan toe te voegen.');
+            return;
+        }
 
         const response = await fetch('http://localhost:5000/tasks', {
             method: 'POST',
@@ -17,7 +25,7 @@ function AddTask() {
                 'Content-Type': 'application/json',
                 Authorization: token,
             },
-            body: JSON.stringify({ title, description, due_date: dueDate }),
+            body: JSON.stringify({ title, description, project_id: projectId }),
         });
 
         const data = await response.json();
@@ -38,26 +46,31 @@ function AddTask() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    style={{ display: 'block', marginBottom: '10px', width: '100%', padding: '8px' }}
                 />
-                <br />
                 <label>Beschrijving:</label>
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
+                    style={{ display: 'block', marginBottom: '10px', width: '100%', padding: '8px' }}
                 />
-                <br />
-                <label>Deadline:</label>
-                <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                />
-                <br />
-                <button type="submit">Add</button>
+                <button
+                    type="submit"
+                    style={{
+                        padding: '10px',
+                        borderRadius: '5px',
+                        border: 'none',
+                        backgroundColor: '#007bff',
+                        color: '#fff',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Toevoegen
+                </button>
             </form>
         </div>
     );
 }
 
-export default AddTask;
+export default AddTasks;

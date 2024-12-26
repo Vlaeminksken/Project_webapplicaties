@@ -157,22 +157,24 @@ function Home() {
             <div className="main-content">
                 <h1>My Tasks</h1>
                 <button
-                    style={{
-                        position: 'fixed',
-                        bottom: '20px',
-                        right: '20px',
-                        borderRadius: '50%',
-                        width: '50px',
-                        height: '50px',
-                        fontSize: '24px',
-                        backgroundColor: '#007bff',
-                        color: '#fff',
-                        border: 'none',
-                    }}
-                    onClick={() => navigate('/add-task')}
-                >
-                    +
-                </button>
+    style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        borderRadius: '50%',
+        width: '50px',
+        height: '50px',
+        fontSize: '24px',
+        backgroundColor: '#007bff',
+        color: '#fff',
+        border: 'none',
+    }}
+    onClick={() => navigate('/add-task', { state: { projectId: selectedProject } })} // Geef projectId mee
+>
+    +
+</button>
+
+
                 <ul className="task-list">
                     {filteredTasks.length > 0 ? (
                         filteredTasks.map((task) => (
