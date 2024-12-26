@@ -99,8 +99,13 @@ function Home() {
     };
     
     const [filteredTasks, setFilteredTasks] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
+    const filteredProjects = projects.filter((project) =>
+        project.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
+    
     return (
         <div className="home-container">
             {/* Sidebar */}
@@ -113,8 +118,22 @@ function Home() {
             
                 <div>
                     <h3>Mijn Projecten</h3>
+                    <input
+                        type="text"
+                        placeholder="Zoek projecten..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            marginBottom: '10px',
+                            border: '1px solid #ccc',
+                            borderRadius: '5px',
+                        }}
+                    />
+
                     <ul style={{ listStyle: 'none', padding: 0, marginTop: '10px' }}>
-                        {projects.map((project) => (
+                        {filteredProjects.map((project) => (
                             <li
                                 key={project.id}
                                 onClick={() => handleSelectProject(project.id)}
@@ -132,6 +151,7 @@ function Home() {
                             </li>
                         ))}
                     </ul>
+
                     {/* Voeg project toe knop */}
                     <button
                         style={{
