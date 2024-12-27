@@ -361,6 +361,24 @@ app.delete('/projects/:id', authenticateToken, (req, res) => {
 });
 
 
+app.get('/users', authenticateToken, (req, res) => {
+    const query = `
+        SELECT id, name
+        FROM USERS
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Fout bij het ophalen van gebruikers:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van gebruikers.' });
+        }
+
+        res.status(200).json(rows || []);
+    });
+});
+
+
+
 
 
 
