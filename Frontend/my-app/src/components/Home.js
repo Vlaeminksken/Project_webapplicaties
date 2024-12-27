@@ -272,7 +272,19 @@ function Home() {
                             Verwijder project
                         </li>
 
-                        <li style={{ cursor: 'pointer' }}>Voeg persoon toe</li>
+                        <li
+                            style={{ marginBottom: '10px', cursor: 'pointer' }}
+                            onClick={() => {
+                                if (selectedProject) {
+                                    navigate('/add-person', { state: { projectId: selectedProject } });
+                                } else {
+                                    alert('Selecteer eerst een project om personen toe te voegen.');
+                                }
+                            }}
+                        >
+                            Voeg persoon toe
+                        </li>
+
                     </ul>
                 )}
             </div>

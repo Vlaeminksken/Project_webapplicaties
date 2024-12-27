@@ -7,6 +7,8 @@ import AddTask from './components/AddTasks';
 import Profile from './components/Profile';
 import AddProject from './components/AddProject';
 import EditProject from './components/EditProject';
+import AddPerson from './components/AddPerson';
+
 
 
 function App() {
@@ -34,6 +36,8 @@ function App() {
                     <Route path="/add-task" element={<AddTask />} />
                     <Route path="/edit-project" element={<EditProject />} />
                     <Route path="/add-project" element={<AddProject />} />
+                    <Route path="/add-person" element={<AddPerson />} />
+
                 </Routes>
             </div>
         </Router>
