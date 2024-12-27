@@ -6,6 +6,7 @@ function AddPerson() {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [roles, setRoles] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -58,6 +59,19 @@ function AddPerson() {
     // Verwijder gebruiker uit geselecteerde lijst
     const handleRemoveUser = (user) => {
         setSelectedUsers(selectedUsers.filter((selected) => selected.id !== user.id));
+        setRoles((prevRoles) => {
+            const updatedRoles = { ...prevRoles };
+            delete updatedRoles[user.id];
+            return updatedRoles;
+        });
+    };
+
+    // Verwerk rolwijziging
+    const handleRoleChange = (userId, role) => {
+        setRoles((prevRoles) => ({
+            ...prevRoles,
+            [userId]: role,
+        }));
     };
 
     // Voeg geselecteerde gebruikers toe aan het project
@@ -90,6 +104,7 @@ function AddPerson() {
                     body: JSON.stringify({
                         userId: user.id,
                         projectId: projectId,
+                        role: roles[user.id] || 'spectator', // Voeg de rol toe
                     }),
                 });
 
@@ -100,6 +115,7 @@ function AddPerson() {
 
             alert('Gebruikers succesvol toegevoegd aan het project!');
             setSelectedUsers([]); // Leeg de geselecteerde lijst
+            setRoles({}); // Leeg de rollenlijst
         } catch (error) {
             console.error('Fout bij het toevoegen van gebruikers:', error.message);
             alert('Er is een fout opgetreden. Probeer het opnieuw.');
@@ -128,7 +144,7 @@ function AddPerson() {
             {/* Eerste Kolom */}
             <div
                 style={{
-                    width: '40%',
+                    width: '30%',
                     borderRight: '1px solid #ddd',
                     padding: '20px',
                     overflowY: 'auto',
@@ -170,8 +186,9 @@ function AddPerson() {
             {/* Tweede Kolom */}
             <div
                 style={{
-                    width: '60%',
+                    width: '30%',
                     padding: '20px',
+                    borderRight: '1px solid #ddd',
                 }}
             >
                 <h2>Geselecteerde Personen</h2>
@@ -190,6 +207,42 @@ function AddPerson() {
                         </li>
                     ))}
                 </ul>
+            </div>
+
+            {/* Derde Kolom */}
+            <div
+                style={{
+                    width: '40%',
+                    padding: '20px',
+                }}
+            >
+                <h2>Rollen Toewijzen</h2>
+                {selectedUsers.map((user) => (
+                    <div
+                        key={user.id}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px',
+                            borderBottom: '1px solid #ddd',
+                        }}
+                    >
+                        <span>{user.name}</span>
+                        <select
+                            value={roles[user.id] || 'spectator'}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            style={{
+                                padding: '5px',
+                                borderRadius: '5px',
+                                border: '1px solid #ddd',
+                            }}
+                        >
+                            <option value="spectator">Spectator</option>
+                            <option value="operator">Operator</option>
+                        </select>
+                    </div>
+                ))}
                 <button
                     style={{
                         marginTop: '20px',

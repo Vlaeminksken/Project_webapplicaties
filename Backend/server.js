@@ -378,17 +378,17 @@ app.get('/users', authenticateToken, (req, res) => {
 });
 
 app.post('/project-members', authenticateToken, (req, res) => {
-    const { userId, projectId } = req.body;
-    const role = 'spectator'; // Standaardrol
+    const { userId, projectId, role } = req.body;
     const joined = new Date().toISOString();
 
-    if (!userId || !projectId) {
-        return res.status(400).json({ message: 'Gebruikers-ID en project-ID zijn verplicht.' });
+    if (!userId || !projectId || !role) {
+        return res.status(400).json({ message: 'Gebruikers-ID, project-ID en rol zijn verplicht.' });
     }
 
     const query = `
         INSERT INTO PROJECT_MEMBERS (user_id, project_id, role, joined)
-        VALUES (?, ?, ?, ?)`;
+        VALUES (?, ?, ?, ?)
+    `;
 
     db.run(query, [userId, projectId, role, joined], function (err) {
         if (err) {
@@ -399,6 +399,7 @@ app.post('/project-members', authenticateToken, (req, res) => {
         res.status(200).json({ message: 'Projectlid succesvol toegevoegd!', memberId: this.lastID });
     });
 });
+
 
 app.get('/assigned-projects', authenticateToken, (req, res) => {
     const userId = req.user.id;
