@@ -400,6 +400,25 @@ app.post('/project-members', authenticateToken, (req, res) => {
     });
 });
 
+app.get('/assigned-projects', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+
+    const query = `
+        SELECT p.id, p.name, p.description
+        FROM PROJECTS p
+        INNER JOIN PROJECT_MEMBERS pm ON p.id = pm.project_id
+        WHERE pm.user_id = ?
+    `;
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error('Fout bij het ophalen van toegewezen projecten:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van projecten.' });
+        }
+
+        res.status(200).json(rows || []);
+    });
+});
 
 
 
