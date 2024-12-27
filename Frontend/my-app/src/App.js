@@ -9,6 +9,7 @@ import AddProject from './components/AddProject';
 import EditProject from './components/EditProject';
 import AddPerson from './components/AddPerson';
 import AssignedToMe from './components/AssignedToMe';
+import EditTask from './components/EditTask';
 
 
 
@@ -40,6 +41,8 @@ function App() {
                     <Route path="/add-project" element={<AddProject />} />
                     <Route path="/add-person" element={<AddPerson />} />
                     <Route path="/assigned-to-me" element={<AssignedToMe />} />
+                    <Route path="/edit-task/:taskId" element={<EditTask />} />
+
 
                 </Routes>
             </div>

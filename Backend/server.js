@@ -192,30 +192,28 @@ app.get('/tasks', authenticateToken, (req, res) => {
 
 app.put('/tasks/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
-    const { title, description, due_date } = req.body;
+    const { title, description, due_date, status } = req.body;
 
     if (!title || !description) {
-        return res.status(400).json({ message: 'Titel en beschrijving zijn verplicht!' });
+        return res.status(400).json({ message: 'Titel en beschrijving zijn verplicht.' });
     }
 
     const query = `
-        UPDATE TASKS 
-        SET title = ?, description = ?, due_date = ?
-        WHERE id = ?`;
+        UPDATE TASKS
+        SET title = ?, description = ?, due_date = ?, status = ?
+        WHERE id = ?
+    `;
 
-    db.run(query, [title, description, due_date, id], function (err) {
+    db.run(query, [title, description, due_date, status, id], function (err) {
         if (err) {
-            console.error('Fout bij het bijwerken van taak:', err.message);
-            return res.status(500).json({ message: 'Bijwerken mislukt!' });
-        }
-
-        if (this.changes === 0) {
-            return res.status(404).json({ message: 'Taak niet gevonden!' });
+            console.error('Fout bij het bijwerken van de taak:', err.message);
+            return res.status(500).json({ message: 'Fout bij het bijwerken van de taak.' });
         }
 
         res.status(200).json({ message: 'Taak succesvol bijgewerkt!' });
     });
 });
+
 
 
 // Profiel gegevens ophalen
@@ -441,7 +439,52 @@ app.get('/project-tasks/:projectId', authenticateToken, (req, res) => {
     });
 });
 
+app.get('/project-role/:projectId', authenticateToken, (req, res) => {
+    const { projectId } = req.params;
+    const userId = req.user.id;
 
+    const query = `
+        SELECT role
+        FROM PROJECT_MEMBERS
+        WHERE project_id = ? AND user_id = ?
+    `;
+
+    db.get(query, [projectId, userId], (err, row) => {
+        if (err) {
+            console.error('Fout bij het ophalen van gebruikersrol:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van rol.' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ message: 'Gebruikersrol niet gevonden.' });
+        }
+
+        res.status(200).json({ role: row.role });
+    });
+});
+
+app.get('/tasks/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT id, title, description, due_date, status
+        FROM TASKS
+        WHERE id = ?
+    `;
+
+    db.get(query, [id], (err, row) => {
+        if (err) {
+            console.error('Fout bij het ophalen van de taak:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van de taak.' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ message: 'Taak niet gevonden.' });
+        }
+
+        res.status(200).json(row);
+    });
+});
 
 
 

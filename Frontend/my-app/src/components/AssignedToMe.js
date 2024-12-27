@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 function AssignedToMe() {
     const [projects, setProjects] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -12,7 +15,7 @@ function AssignedToMe() {
             return;
         }
 
-        // Haal toegewezen projecten op
+        // Haal projecten op waar de gebruiker lid van is
         fetch('http://localhost:5000/assigned-projects', {
             method: 'GET',
             headers: { Authorization: token },
@@ -30,146 +33,151 @@ function AssignedToMe() {
             });
     }, [navigate]);
 
-    const [showPopup, setShowPopup] = useState(false);
-const [tasks, setTasks] = useState([]);
-const [selectedProject, setSelectedProject] = useState(null);
-
-const handleProjectClick = async (projectId) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Je bent niet ingelogd.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:5000/project-tasks/${projectId}`, {
-            method: 'GET',
-            headers: { Authorization: token },
-        });
-
-        if (!response.ok) {
-            throw new Error('Fout bij het ophalen van taken.');
+    const checkUserRole = async (projectId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Je bent niet ingelogd.');
+            return;
         }
 
-        const data = await response.json();
-        setTasks(data);
+        try {
+            const response = await fetch(`http://localhost:5000/project-role/${projectId}`, {
+                method: 'GET',
+                headers: { Authorization: token },
+            });
+
+            if (!response.ok) {
+                throw new Error('Fout bij het ophalen van gebruikersrol.');
+            }
+
+            const data = await response.json();
+            setUserRole(data.role);
+        } catch (error) {
+            console.error(error.message);
+            alert('Er is een fout opgetreden bij het ophalen van gebruikersrol.');
+        }
+    };
+
+    const fetchProjectTasks = async (projectId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Je bent niet ingelogd.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/project-tasks/${projectId}`, {
+                method: 'GET',
+                headers: { Authorization: token },
+            });
+
+            if (!response.ok) {
+                throw new Error('Fout bij het ophalen van taken.');
+            }
+
+            const data = await response.json();
+            setTasks(data);
+        } catch (error) {
+            console.error(error.message);
+            alert('Er is een fout opgetreden bij het ophalen van taken.');
+        }
+    };
+
+    useEffect(() => {
+        if (selectedProject) {
+            checkUserRole(selectedProject);
+            fetchProjectTasks(selectedProject);
+        }
+    }, [selectedProject]);
+
+    const handleProjectClick = (projectId) => {
         setSelectedProject(projectId);
-        setShowPopup(true); // Open de pop-up
-    } catch (error) {
-        console.error(error.message);
-        alert('Er is een fout opgetreden bij het ophalen van taken.');
-    }
-};
+    };
 
-const closePopup = () => {
-    setShowPopup(false);
-    setTasks([]);
-    setSelectedProject(null);
-};
-
+    const handleEditTask = (taskId) => {
+        if (userRole !== 'operator') {
+            alert('Je hebt geen rechten om deze taak te bewerken.');
+            return;
+        }
+        navigate(`/edit-task/${taskId}`);
+    };
+    
 
     return (
         <div style={{ padding: '20px' }}>
             <h2>Projecten Toegewezen aan Mij</h2>
-            <div style={{ marginTop: '20px' }}>
-                {projects.map((project) => (
-                    <div
-                    key={project.id}
-                    style={{
-                        border: '1px solid #ddd',
-                        borderRadius: '5px',
-                        padding: '15px',
-                        marginBottom: '15px',
-                        backgroundColor: '#f9f9f9',
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => handleProjectClick(project.id)} // Open taken bij klik
-                >
-                    <h3>{project.name}</h3>
-                    <p>{project.description || 'Geen beschrijving beschikbaar.'}</p>
+            <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+                {/* Projectlijst */}
+                <div style={{ width: '30%', border: '1px solid #ddd', borderRadius: '5px', padding: '10px' }}>
+                    <h3>Projecten</h3>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                        {projects.map((project) => (
+                            <li
+                                key={project.id}
+                                onClick={() => handleProjectClick(project.id)}
+                                style={{
+                                    padding: '10px',
+                                    borderBottom: '1px solid #ddd',
+                                    cursor: 'pointer',
+                                    backgroundColor: selectedProject === project.id ? '#f0f0f0' : 'transparent',
+                                }}
+                            >
+                                <strong>{project.name}</strong>
+                                <p>{project.description}</p>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-                
-                ))}
-            </div>
-            <button
-                onClick={() => navigate('/home')}
-                style={{
-                    marginTop: '20px',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    border: 'none',
-                    backgroundColor: '#007bff',
-                    color: '#fff',
-                    cursor: 'pointer',
-                }}
-            >
-                Terug naar Home
-            </button>
-            {showPopup && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        zIndex: 10,
-                    }}
-                    onClick={closePopup} // Klik buiten de pop-up om te sluiten
-                >
-                    <div
-                        style={{
-                            background: '#fff',
-                            padding: '20px',
-                            borderRadius: '5px',
-                            width: '50%',
-                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                        }}
-                        onClick={(e) => e.stopPropagation()} // Voorkom sluiten bij klik binnen de pop-up
-                    >
-                        <h2>Taken voor Project {selectedProject}</h2>
+
+                {/* Takenlijst */}
+                <div style={{ width: '70%', border: '1px solid #ddd', borderRadius: '5px', padding: '10px' }}>
+                    <h3>Taken voor Project {selectedProject || ''}</h3>
+                    {tasks.length > 0 ? (
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {tasks.map((task) => (
                                 <li
                                     key={task.id}
                                     style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
                                         padding: '10px',
                                         borderBottom: '1px solid #ddd',
                                     }}
                                 >
-                                    <h4>{task.title}</h4>
-                                    <p>{task.description}</p>
-                                    <p>
-                                        <strong>Status:</strong> {task.status || 'Niet gespecificeerd'}
-                                    </p>
-                                    <p>
-                                        <strong>Deadline:</strong> {task.due_date || 'Geen deadline'}
-                                    </p>
+                                    <div>
+                                        <h4>{task.title}</h4>
+                                        <p>{task.description}</p>
+                                        <p>
+                                            <strong>Status:</strong> {task.status || 'Niet gespecificeerd'}
+                                        </p>
+                                        <p>
+                                            <strong>Deadline:</strong> {task.due_date || 'Geen deadline'}
+                                        </p>
+                                    </div>
+                                    {userRole === 'operator' && (
+                                        <button
+                                            onClick={() => handleEditTask(task.id)}
+                                            style={{
+                                                padding: '5px 10px',
+                                                borderRadius: '5px',
+                                                border: 'none',
+                                                backgroundColor: '#007bff',
+                                                color: '#fff',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            Bewerk
+                                        </button>
+                                    )}
                                 </li>
                             ))}
                         </ul>
-                        <button
-                            onClick={closePopup}
-                            style={{
-                                marginTop: '10px',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: 'none',
-                                backgroundColor: '#007bff',
-                                color: '#fff',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Sluiten
-                        </button>
-                    </div>
+                    ) : (
+                        <p>Geen taken beschikbaar.</p>
+                    )}
                 </div>
-            )}
-
+            </div>
         </div>
     );
 }
