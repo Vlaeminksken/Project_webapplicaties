@@ -158,7 +158,20 @@ function Home() {
             <div className="sidebar">
                 <button onClick={handleLogout}>Log Out</button>
                 <button onClick={() => navigate('/profile')}>Profiel</button>
-                <button onClick={() => alert('Toegewezen aan mij functie wordt later toegevoegd.')}>Toegewezen aan mij</button>
+                <button
+                    onClick={() => navigate('/assigned-to-me')}
+                    style={{
+                        marginBottom: '10px',
+                        padding: '10px',
+                        borderRadius: '5px',
+                        border: 'none',
+                        backgroundColor: '#007bff',
+                        color: '#fff',
+                    }}
+                >
+                    Toegewezen aan mij
+                </button>
+
                 <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
                 <hr style={{ width: '100%', margin: '20px 0', borderColor: '#ddd' }} />
             

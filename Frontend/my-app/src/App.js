@@ -8,6 +8,8 @@ import Profile from './components/Profile';
 import AddProject from './components/AddProject';
 import EditProject from './components/EditProject';
 import AddPerson from './components/AddPerson';
+import AssignedToMe from './components/AssignedToMe';
+
 
 
 
@@ -37,6 +39,7 @@ function App() {
                     <Route path="/edit-project" element={<EditProject />} />
                     <Route path="/add-project" element={<AddProject />} />
                     <Route path="/add-person" element={<AddPerson />} />
+                    <Route path="/assigned-to-me" element={<AssignedToMe />} />
 
                 </Routes>
             </div>
