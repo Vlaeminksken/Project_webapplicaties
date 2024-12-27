@@ -111,6 +111,46 @@ function Home() {
         setIsDropdownOpen((prev) => !prev);
     };
     
+    const handleDeleteProject = async () => {
+        if (!selectedProject) {
+            alert('Selecteer een project om te verwijderen.');
+            return;
+        }
+    
+        const token = localStorage.getItem('token');
+        const confirmDelete = window.confirm(
+            'Weet je zeker dat je dit project wilt verwijderen? Dit kan niet ongedaan worden gemaakt.'
+        );
+    
+        if (!confirmDelete) return;
+    
+        try {
+            const response = await fetch(`http://localhost:5000/projects/${selectedProject}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: token,
+                },
+            });
+    
+            if (response.ok) {
+                //alert('Project succesvol verwijderd!');
+                setProjects((prevProjects) =>
+                    prevProjects.filter((project) => project.id !== selectedProject)
+                );
+                setSelectedProject(null);
+                setFilteredTasks([]); // Leeg de takenlijst
+                navigate('/home');
+            } else {
+                const data = await response.json();
+                alert(`Fout bij het verwijderen van project: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Fout bij het verwijderen van project:', error.message);
+            alert('Er is een fout opgetreden. Probeer het opnieuw.');
+        }
+    };
+    
+    
     
     return (
         <div className="home-container">
@@ -213,19 +253,25 @@ function Home() {
                         }}
                     >
                         <li
-    style={{ marginBottom: '10px', cursor: 'pointer' }}
-    onClick={() => {
-        if (selectedProject) {
-            navigate('/edit-project', { state: { projectId: selectedProject } });
-        } else {
-            alert('Selecteer eerst een project om te bewerken.');
-        }
-    }}
->
-    Bewerk project
-</li>
+                            style={{ marginBottom: '10px', cursor: 'pointer' }}
+                            onClick={() => {
+                                if (selectedProject) {
+                                    navigate('/edit-project', { state: { projectId: selectedProject } });
+                                } else {
+                                    alert('Selecteer eerst een project om te bewerken.');
+                                }
+                            }}
+                        >
+                            Bewerk project
+                        </li>
 
-                        <li style={{ marginBottom: '10px', cursor: 'pointer' }}>Verwijder project</li>
+                        <li
+                            style={{ marginBottom: '10px', cursor: 'pointer' }}
+                            onClick={handleDeleteProject}
+                        >
+                            Verwijder project
+                        </li>
+
                         <li style={{ cursor: 'pointer' }}>Voeg persoon toe</li>
                     </ul>
                 )}

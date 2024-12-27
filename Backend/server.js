@@ -109,7 +109,7 @@ app.post('/login', (req, res) => {
             const passwordMatch = await bcrypt.compare(password, row.password);
             if (passwordMatch) {
                 const token = jwt.sign({ id: row.id, name: row.name, role: row.role }, SECRET_KEY, { expiresIn: '1h' });
-                res.status(200).json({ message: 'Succesvol ingelogd!', token });
+                //res.status(200).json({ message: 'Succesvol ingelogd!', token });
             } else {
                 res.status(401).json({ message: 'Onjuiste gebruikersnaam of wachtwoord!' });
             }
@@ -331,6 +331,32 @@ app.get('/projects/:id', authenticateToken, (req, res) => {
 
         console.log('Project gevonden:', row);
         res.status(200).json(row);
+    });
+});
+
+app.delete('/projects/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    console.log('Ontvangen project ID:', id);
+    console.log('Gebruikers ID:', req.user.id);
+
+    const query = `
+        DELETE FROM PROJECTS
+        WHERE id = ? AND created_by = ?`;
+
+    db.run(query, [id, req.user.id], function (err) {
+        if (err) {
+            console.error('Databasefout bij verwijderen van project:', err.message);
+            return res.status(500).json({ message: 'Fout bij het verwijderen van project.' });
+        }
+
+        if (this.changes === 0) {
+            console.log('Geen project gevonden om te verwijderen.');
+            return res.status(404).json({ message: 'Project niet gevonden.' });
+        }
+
+        console.log('Project succesvol verwijderd.');
+        res.status(200).json({ message: 'Project succesvol verwijderd!' });
     });
 });
 
