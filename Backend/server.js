@@ -109,7 +109,7 @@ app.post('/login', (req, res) => {
             const passwordMatch = await bcrypt.compare(password, row.password);
             if (passwordMatch) {
                 const token = jwt.sign({ id: row.id, name: row.name, role: row.role }, SECRET_KEY, { expiresIn: '1h' });
-                //res.status(200).json({ message: 'Succesvol ingelogd!', token });
+                res.status(200).json({ message: 'Succesvol ingelogd!', token });
             } else {
                 res.status(401).json({ message: 'Onjuiste gebruikersnaam of wachtwoord!' });
             }

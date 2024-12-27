@@ -10,20 +10,30 @@ function Login({ setNotification }) {
     const handleLogin = async (e) => {
         e.preventDefault();
     
-        const response = await fetch('http://localhost:5000/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: username, password }),
-        });
+        try {
+            const response = await fetch('http://localhost:5000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: username, password }),
+            });
     
-        const data = await response.json();
-        setNotification(data.message);
+            const data = await response.json();
+            console.log('Server Response:', response.status, data);
     
-        if (response.ok) {
-            localStorage.setItem('token', data.token); // Token opslaan
-            navigate('/home');
+            setNotification(data.message);
+    
+            if (response.ok) {
+                localStorage.setItem('token', data.token); // Token opslaan
+                navigate('/home');
+            } else {
+                alert(`Fout: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Fout bij inloggen:', error);
+            alert('Er is een fout opgetreden. Controleer je verbinding.');
         }
     };
+    
     
     
     
