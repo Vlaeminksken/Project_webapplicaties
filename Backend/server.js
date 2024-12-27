@@ -421,6 +421,24 @@ app.get('/assigned-projects', authenticateToken, (req, res) => {
 });
 
 
+app.get('/project-tasks/:projectId', authenticateToken, (req, res) => {
+    const { projectId } = req.params;
+
+    const query = `
+        SELECT id, title, description, status, due_date
+        FROM TASKS
+        WHERE project_id = ?
+    `;
+
+    db.all(query, [projectId], (err, rows) => {
+        if (err) {
+            console.error('Fout bij het ophalen van taken:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van taken.' });
+        }
+
+        res.status(200).json(rows || []);
+    });
+});
 
 
 
