@@ -377,6 +377,30 @@ app.get('/users', authenticateToken, (req, res) => {
     });
 });
 
+app.post('/project-members', authenticateToken, (req, res) => {
+    const { userId, projectId } = req.body;
+    const role = 'spectator'; // Standaardrol
+    const joined = new Date().toISOString();
+
+    if (!userId || !projectId) {
+        return res.status(400).json({ message: 'Gebruikers-ID en project-ID zijn verplicht.' });
+    }
+
+    const query = `
+        INSERT INTO PROJECT_MEMBERS (user_id, project_id, role, joined)
+        VALUES (?, ?, ?, ?)`;
+
+    db.run(query, [userId, projectId, role, joined], function (err) {
+        if (err) {
+            console.error('Fout bij het toevoegen van projectlid:', err.message);
+            return res.status(500).json({ message: 'Fout bij het toevoegen van projectlid.' });
+        }
+
+        res.status(200).json({ message: 'Projectlid succesvol toegevoegd!', memberId: this.lastID });
+    });
+});
+
+
 
 
 

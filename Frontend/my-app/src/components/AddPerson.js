@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function AddPerson() {
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const [searchTerm, setSearchTerm] = useState(''); // Voor de zoekbalk
-    const [selectedUsers, setSelectedUsers] = useState([]); // Voor de 2e kolom
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -36,7 +37,7 @@ function AddPerson() {
             });
     }, [navigate]);
 
-    // Filter de gebruikerslijst op basis van de zoekterm
+    // Filter gebruikerslijst op zoekterm
     const handleSearch = (e) => {
         const term = e.target.value;
         setSearchTerm(term);
@@ -47,20 +48,83 @@ function AddPerson() {
         );
     };
 
-    // Voeg een gebruiker toe aan de geselecteerde lijst
+    // Voeg gebruiker toe aan geselecteerde lijst
     const handleUserSelect = (user) => {
         if (!selectedUsers.some((selected) => selected.id === user.id)) {
             setSelectedUsers([...selectedUsers, user]);
         }
     };
 
-    // Verwijder een gebruiker uit de originele lijst bij selectie
+    // Verwijder gebruiker uit geselecteerde lijst
     const handleRemoveUser = (user) => {
         setSelectedUsers(selectedUsers.filter((selected) => selected.id !== user.id));
     };
 
+    // Voeg geselecteerde gebruikers toe aan het project
+    const handleAddToProject = async () => {
+        if (selectedUsers.length === 0) {
+            alert('Selecteer minstens één gebruiker om toe te voegen.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Je bent niet ingelogd.');
+            return;
+        }
+
+        const projectId = location.state?.projectId;
+        if (!projectId) {
+            alert('Geen project geselecteerd.');
+            return;
+        }
+
+        try {
+            for (const user of selectedUsers) {
+                const response = await fetch('http://localhost:5000/project-members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token,
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        projectId: projectId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Fout bij het toevoegen van projectlid.');
+                }
+            }
+
+            alert('Gebruikers succesvol toegevoegd aan het project!');
+            setSelectedUsers([]); // Leeg de geselecteerde lijst
+        } catch (error) {
+            console.error('Fout bij het toevoegen van gebruikers:', error.message);
+            alert('Er is een fout opgetreden. Probeer het opnieuw.');
+        }
+    };
+
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
+            {/* Retourknop */}
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                    color: '#007bff',
+                }}
+            >
+                Terug naar Home
+            </button>
+
             {/* Eerste Kolom */}
             <div
                 style={{
@@ -136,7 +200,7 @@ function AddPerson() {
                         color: '#fff',
                         cursor: 'pointer',
                     }}
-                    onClick={() => alert('Personen toegevoegd aan project!')}
+                    onClick={handleAddToProject}
                 >
                     Voeg toe aan Project
                 </button>
