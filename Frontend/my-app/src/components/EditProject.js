@@ -3,42 +3,62 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 function EditProject() {
     const [project, setProject] = useState({ name: '', description: '' });
+    const [members, setMembers] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Haal het project ID op uit de locatie state
     const projectId = location.state?.projectId || null;
 
     useEffect(() => {
-        console.log('Project ID:', projectId); // Debugging
-        const token = localStorage.getItem('token');
-        if (!token || !projectId) {
-            console.log('Geen token of projectId gevonden.');
-            navigate('/home');
-            return;
-        }
+        const fetchProject = async () => {
+            const token = localStorage.getItem('token');
+            if (!token || !projectId) {
+                navigate('/home');
+                return;
+            }
 
-        // Haal de huidige projectgegevens op
-        fetch(`http://localhost:5000/projects/${projectId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: token,
-            },
-        })
-            .then((response) => {
+            try {
+                const response = await fetch(`http://localhost:5000/projects/${projectId}`, {
+                    method: 'GET',
+                    headers: { Authorization: token },
+                });
+
                 if (!response.ok) {
-                    console.error('Fetch failed:', response.status, response.statusText); // Debugging
                     throw new Error('Fout bij het ophalen van projectgegevens.');
                 }
-                return response.json();
-            })
-            .then((data) => setProject(data))
-            .catch((error) => {
+
+                const data = await response.json();
+                setProject(data);
+            } catch (error) {
                 console.error(error.message);
                 alert('Fout bij het ophalen van projectgegevens.');
                 navigate('/home');
-            });
-        
+            }
+        };
+
+        const fetchMembers = async () => {
+            const token = localStorage.getItem('token');
+            if (!token || !projectId) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/projects/${projectId}/members`, {
+                    method: 'GET',
+                    headers: { Authorization: token },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Fout bij het ophalen van projectleden.');
+                }
+
+                const data = await response.json();
+                setMembers(data);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchProject();
+        fetchMembers();
     }, [projectId, navigate]);
 
     const handleUpdateProject = async (e) => {
@@ -55,7 +75,6 @@ function EditProject() {
         });
 
         if (response.ok) {
-            //alert('Project succesvol bijgewerkt!');
             navigate('/home');
         } else {
             alert('Fout bij het bijwerken van het project.');
@@ -108,6 +127,24 @@ function EditProject() {
                     Bijwerken
                 </button>
             </form>
+            <h3>Projectleden</h3>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+                {members.length > 0 ? (
+                    members.map((member, index) => (
+                        <li
+                            key={index}
+                            style={{
+                                padding: '10px',
+                                borderBottom: '1px solid #ddd',
+                            }}
+                        >
+                            <strong>{member.name}</strong> - {member.role}
+                        </li>
+                    ))
+                ) : (
+                    <p>Geen leden gevonden.</p>
+                )}
+            </ul>
         </div>
     );
 }

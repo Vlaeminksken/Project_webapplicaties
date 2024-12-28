@@ -486,6 +486,25 @@ app.get('/tasks/:id', authenticateToken, (req, res) => {
     });
 });
 
+app.get('/projects/:id/members', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT u.name, pm.role
+        FROM PROJECT_MEMBERS pm
+        INNER JOIN USERS u ON pm.user_id = u.id
+        WHERE pm.project_id = ?
+    `;
+
+    db.all(query, [id], (err, rows) => {
+        if (err) {
+            console.error('Fout bij het ophalen van projectleden:', err.message);
+            return res.status(500).json({ message: 'Fout bij het ophalen van projectleden.' });
+        }
+
+        res.status(200).json(rows || []);
+    });
+});
 
 
 
