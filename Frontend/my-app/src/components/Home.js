@@ -150,6 +150,39 @@ function Home() {
         }
     };
     
+    const handleToggleStatus = async (taskId, currentStatus) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Je bent niet ingelogd.');
+            return;
+        }
+    
+        const newStatus = currentStatus === 'pending' ? 'ended' : 'pending';
+    
+        try {
+            const response = await fetch(`http://localhost:5000/tasks/${taskId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: token,
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Fout bij het bijwerken van de status.');
+            }
+    
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.id === taskId ? { ...task, status: newStatus } : task
+                )
+            );
+        } catch (error) {
+            console.error(error.message);
+            alert('Er is een fout opgetreden bij het bijwerken van de status.');
+        }
+    };
     
     
     return (
@@ -322,35 +355,41 @@ function Home() {
                     +
                 </button>
                 <ul className="task-list">
-                    {filteredTasks.length > 0 ? (
-                        filteredTasks.map((task) => (
-                            <li
-                                key={task.id}
-                                onClick={() => openEditPanel(task)} // Open bewerkingspaneel
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '15px',
-                                    marginBottom: '10px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '5px',
-                                    backgroundColor: '#f9f9f9',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <input type="checkbox" style={{ marginRight: '10px' }} />
-                                <div>
-                                    <h3>{task.title}</h3>
-                                    <p>{task.description}</p>
-                                    <small>Deadline: {task.due_date || 'Geen'}</small>
-                                </div>
-                            </li>
-                        ))
-                    ) : (
-                        <p>Geen taken gevonden.</p>
-                    )}
-                </ul>
+    {filteredTasks.map((task) => (
+        <li
+            key={task.id}
+            onClick={(e) => {
+                if (e.target.type !== 'checkbox') openEditPanel(task);
+            }} // Alleen de vierkant wordt geactiveerd als de checkbox niet wordt aangeklikt
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '15px',
+                marginBottom: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '5px',
+                backgroundColor: '#f9f9f9',
+                cursor: 'pointer',
+                textDecoration: task.status === 'ended' ? 'line-through' : 'none',
+                opacity: task.status === 'ended' ? 0.6 : 1,
+            }}
+        >
+            <input
+                type="checkbox"
+                checked={task.status === 'ended'}
+                onChange={() => handleToggleStatus(task.id, task.status)}
+                style={{ marginRight: '10px' }}
+            />
+            <div>
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <small>Deadline: {task.due_date || 'Geen'}</small>
+            </div>
+        </li>
+    ))}
+</ul>
+
                 {isEditing && (
                     <>
                         <div

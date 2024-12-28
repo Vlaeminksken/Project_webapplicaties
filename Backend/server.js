@@ -555,5 +555,28 @@ app.put('/profile', authenticateToken, (req, res) => {
 });
 
 
+app.put('/tasks/:id/status', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+        return res.status(400).json({ message: 'Status is verplicht.' });
+    }
+
+    const query = `
+        UPDATE TASKS
+        SET status = ?
+        WHERE id = ?
+    `;
+
+    db.run(query, [status, id], function (err) {
+        if (err) {
+            console.error('Fout bij het bijwerken van de status:', err.message);
+            return res.status(500).json({ message: 'Fout bij het bijwerken van de status.' });
+        }
+
+        res.status(200).json({ message: 'Status succesvol bijgewerkt!' });
+    });
+});
 
 
