@@ -103,8 +103,52 @@ function EditProject() {
         }
     };
 
+    const shareOnSocialMedia = (platform) => {
+        const projectUrl = encodeURIComponent(`http://localhost:3000/projects/${project.id}`);
+        const projectTitle = encodeURIComponent(project.name);
+    
+        let shareUrl = '';
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${projectTitle}&url=${projectUrl}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${projectUrl}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/shareArticle?url=${projectUrl}&title=${projectTitle}`;
+                break;
+            default:
+                break;
+        }
+    
+        window.open(shareUrl, '_blank');
+    };
+    
+
     return (
         <div style={{ padding: '20px' }}>
+
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    backgroundColor: '#007bff',
+                    color: '#fff',
+                    cursor: 'pointer',
+                }}
+            >
+                Terug naar Home
+            </button>
+            <button onClick={() => shareOnSocialMedia('twitter')}>Deel op Twitter</button>
+            <button onClick={() => shareOnSocialMedia('facebook')}>Deel op Facebook</button>
+            <button onClick={() => shareOnSocialMedia('linkedin')}>Deel op LinkedIn</button>
+
             <h2>Bewerk Project</h2>
             <form onSubmit={handleUpdateProject}>
                 <label>Naam:</label>

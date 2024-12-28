@@ -530,6 +530,30 @@ app.delete('/projects/:projectId/members/:memberId', authenticateToken, (req, re
     });
 });
 
+app.put('/profile', authenticateToken, (req, res) => {
+    const { name, email } = req.body;
+    const userId = req.user.id;
+
+    if (!name || !email) {
+        return res.status(400).json({ message: 'Naam en email zijn verplicht.' });
+    }
+
+    const query = `
+        UPDATE USERS
+        SET name = ?, email = ?
+        WHERE id = ?
+    `;
+
+    db.run(query, [name, email, userId], function (err) {
+        if (err) {
+            console.error('Fout bij het bijwerken van profielgegevens:', err.message);
+            return res.status(500).json({ message: 'Fout bij het bijwerken van profielgegevens.' });
+        }
+
+        res.status(200).json({ message: 'Profiel succesvol bijgewerkt!' });
+    });
+});
+
 
 
 
