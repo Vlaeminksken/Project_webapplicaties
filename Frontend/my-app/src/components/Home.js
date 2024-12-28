@@ -205,9 +205,7 @@ function Home() {
                     Toegewezen aan mij
                 </button>
 
-                <button onClick={() => alert('Belangrijk functie wordt later toegevoegd.')}>Belangrijk</button>
-                <hr style={{ width: '100%', margin: '20px 0', borderColor: '#ddd' }} />
-            
+                   
                 <div>
                     <h3>Mijn Projecten</h3>
                     <input
@@ -333,9 +331,6 @@ function Home() {
 
                     </ul>
                 )}
-            </div>
-
-
                 <h1>My Tasks</h1>
                 <button
                     style={{
@@ -354,41 +349,45 @@ function Home() {
                 >
                     +
                 </button>
-                <ul className="task-list">
-    {filteredTasks.map((task) => (
-        <li
-            key={task.id}
-            onClick={(e) => {
-                if (e.target.type !== 'checkbox') openEditPanel(task);
-            }} // Alleen de vierkant wordt geactiveerd als de checkbox niet wordt aangeklikt
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '15px',
-                marginBottom: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                backgroundColor: '#f9f9f9',
-                cursor: 'pointer',
-                textDecoration: task.status === 'ended' ? 'line-through' : 'none',
-                opacity: task.status === 'ended' ? 0.6 : 1,
-            }}
-        >
-            <input
-                type="checkbox"
-                checked={task.status === 'ended'}
-                onChange={() => handleToggleStatus(task.id, task.status)}
-                style={{ marginRight: '10px' }}
-            />
-            <div>
-                <h3>{task.title}</h3>
-                <p>{task.description}</p>
-                <small>Deadline: {task.due_date || 'Geen'}</small>
             </div>
-        </li>
-    ))}
-</ul>
+
+
+                
+                <ul className="task-list">
+                    {filteredTasks.map((task) => (
+                        <li
+                            key={task.id}
+                            onClick={(e) => {
+                                if (e.target.type !== 'checkbox') openEditPanel(task);
+                            }} // Alleen de vierkant wordt geactiveerd als de checkbox niet wordt aangeklikt
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '15px',
+                                marginBottom: '10px',
+                                border: '1px solid #ddd',
+                                borderRadius: '5px',
+                                backgroundColor: '#f9f9f9',
+                                cursor: 'pointer',
+                                textDecoration: task.status === 'ended' ? 'line-through' : 'none',
+                                opacity: task.status === 'ended' ? 0.6 : 1,
+                            }}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={task.status === 'ended'}
+                                onChange={() => handleToggleStatus(task.id, task.status)}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <div>
+                                <h3>{task.title}</h3>
+                                <p>{task.description}</p>
+                                <small>Deadline: {task.due_date || 'Geen'}</small>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
 
                 {isEditing && (
                     <>
