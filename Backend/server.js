@@ -486,25 +486,50 @@ app.get('/tasks/:id', authenticateToken, (req, res) => {
     });
 });
 
-app.get('/projects/:id/members', authenticateToken, (req, res) => {
-    const { id } = req.params;
+// Endpoint voor het ophalen van projectleden
+app.get('/projects/:projectId/members', authenticateToken, (req, res) => {
+    const { projectId } = req.params;
 
     const query = `
-        SELECT u.name, pm.role
-        FROM PROJECT_MEMBERS pm
-        INNER JOIN USERS u ON pm.user_id = u.id
-        WHERE pm.project_id = ?
+        SELECT PROJECT_MEMBERS.id, USERS.name, PROJECT_MEMBERS.role
+        FROM PROJECT_MEMBERS
+        JOIN USERS ON PROJECT_MEMBERS.user_id = USERS.id
+        WHERE PROJECT_MEMBERS.project_id = ?
     `;
 
-    db.all(query, [id], (err, rows) => {
+    db.all(query, [projectId], (err, rows) => {
         if (err) {
             console.error('Fout bij het ophalen van projectleden:', err.message);
             return res.status(500).json({ message: 'Fout bij het ophalen van projectleden.' });
         }
 
-        res.status(200).json(rows || []);
+        res.status(200).json(rows);
     });
 });
+
+// Endpoint voor het verwijderen van een projectlid
+app.delete('/projects/:projectId/members/:memberId', authenticateToken, (req, res) => {
+    const { projectId, memberId } = req.params;
+
+    const query = `
+        DELETE FROM PROJECT_MEMBERS
+        WHERE id = ? AND project_id = ?
+    `;
+
+    db.run(query, [memberId, projectId], function (err) {
+        if (err) {
+            console.error('Fout bij het verwijderen van projectlid:', err.message);
+            return res.status(500).json({ message: 'Fout bij het verwijderen van projectlid.' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Projectlid niet gevonden.' });
+        }
+
+        res.status(200).json({ message: 'Projectlid succesvol verwijderd!' });
+    });
+});
+
 
 
 

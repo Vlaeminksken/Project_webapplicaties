@@ -81,6 +81,28 @@ function EditProject() {
         }
     };
 
+    const handleRemoveMember = async (memberId) => {
+        const token = localStorage.getItem('token');
+        if (!token || !projectId) return;
+
+        try {
+            const response = await fetch(`http://localhost:5000/projects/${projectId}/members/${memberId}`, {
+                method: 'DELETE',
+                headers: { Authorization: token },
+            });
+
+            if (!response.ok) {
+                throw new Error('Fout bij het verwijderen van projectlid.');
+            }
+
+            alert('Projectlid succesvol verwijderd!');
+            setMembers(members.filter((member) => member.id !== memberId));
+        } catch (error) {
+            console.error(error.message);
+            alert('Er is een fout opgetreden bij het verwijderen van het projectlid.');
+        }
+    };
+
     return (
         <div style={{ padding: '20px' }}>
             <h2>Bewerk Project</h2>
@@ -130,15 +152,33 @@ function EditProject() {
             <h3>Projectleden</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
                 {members.length > 0 ? (
-                    members.map((member, index) => (
+                    members.map((member) => (
                         <li
-                            key={index}
+                            key={member.id}
                             style={{
                                 padding: '10px',
                                 borderBottom: '1px solid #ddd',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
                             }}
                         >
-                            <strong>{member.name}</strong> - {member.role}
+                            <div>
+                                <strong>{member.name}</strong> - {member.role}
+                            </div>
+                            <button
+                                onClick={() => handleRemoveMember(member.id)}
+                                style={{
+                                    padding: '5px 10px',
+                                    borderRadius: '5px',
+                                    border: 'none',
+                                    backgroundColor: '#dc3545',
+                                    color: '#fff',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Verwijder
+                            </button>
                         </li>
                     ))
                 ) : (
