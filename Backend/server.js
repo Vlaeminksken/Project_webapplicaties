@@ -16,12 +16,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Verbind met SQLite database
-const dbPath = path.resolve(__dirname, '../database/Database.db');
+const dbPath = process.env.DATABASE_PATH || './Database/Database.db';
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error opening database:', err.message);
     } else {
-        console.log('Connected to SQLite database.');
+        console.log(`Connected to database at ${dbPath}`);
     }
 });
 

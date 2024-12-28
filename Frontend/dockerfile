@@ -1,0 +1,16 @@
+# Frontend Dockerfile
+FROM node:16
+WORKDIR /app
+
+# Kopieer package.json en package-lock.json om dependencies te installeren
+COPY my-app/package*.json ./
+
+# Installeer dependencies
+RUN npm install
+
+# Kopieer de rest van de frontend-code
+COPY my-app ./
+
+# Expose poort en start de app
+EXPOSE 3000
+CMD ["npm", "start"]
