@@ -31,5 +31,6 @@ services:
     image: nouchka/sqlite3:latest
     volumes:
       - ./Database:/data
-    command: tail -f /dev/null
+    command: sqlite3 /database/Database.db
+
 
