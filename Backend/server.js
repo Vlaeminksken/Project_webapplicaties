@@ -16,8 +16,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Verbind met SQLite database
-/*  dit werkt voor docker 
 
+// voor docker den deze 
 const dbPath = process.env.DATABASE_PATH || './Database/Database.db';
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
@@ -26,8 +26,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.log(`Connected to database at ${dbPath}`);
     }
 });
-*/
 
+/* 
 const dbPath = path.resolve(__dirname, '../database/Database.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
@@ -36,7 +36,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.log('Connected to SQLite database.');
     }
 });
-
+*/
 // Middleware om beveiligde routes te beschermen
 function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
@@ -590,5 +590,964 @@ app.put('/tasks/:id/status', authenticateToken, (req, res) => {
         res.status(200).json({ message: 'Status succesvol bijgewerkt!' });
     });
 });
+
+
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Documentatie',
+            version: '1.0.0',
+            description: 'Beschrijft alle beschikbare endpoints',
+        },
+        servers: [{ url: 'http://localhost:5000' }],
+    },
+    apis: ['./server.js'], // Geef het pad naar je bestand
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+
+//-----
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Registreer een nieuwe gebruiker
+ *     tags: [Gebruikers]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Naam van de gebruiker
+ *               email:
+ *                 type: string
+ *                 description: E-mailadres van de gebruiker
+ *               password:
+ *                 type: string
+ *                 description: Wachtwoord van de gebruiker
+ *     responses:
+ *       200:
+ *         description: Gebruiker succesvol geregistreerd
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende velden of al bestaande email)
+ *       500:
+ *         description: Interne serverfout
+ */
+
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Verwijder een taak op basis van ID
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van de taak die verwijderd moet worden
+ *     responses:
+ *       200:
+ *         description: Taak succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Taak niet gevonden
+ *       500:
+ *         description: Fout bij het verwijderen van de taak
+ */
+
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Log een gebruiker in
+ *     tags: [Gebruikers]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: De gebruikersnaam
+ *               password:
+ *                 type: string
+ *                 description: Het wachtwoord
+ *     responses:
+ *       200:
+ *         description: Succesvol ingelogd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *                   description: De gegenereerde JWT-token
+ *       400:
+ *         description: Ontbrekende velden in het verzoek
+ *       401:
+ *         description: Onjuiste gebruikersnaam of wachtwoord
+ *       500:
+ *         description: Interne serverfout
+ */
+
+
+/**
+ * @swagger
+ * /home:
+ *   get:
+ *     summary: Toegang tot de beveiligde homepagina
+ *     tags: [Algemeen]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Welkom op de homepagina
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Welkomstbericht
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: De ID van de ingelogde gebruiker
+ *       401:
+ *         description: Geen geldige token verstrekt
+ *       403:
+ *         description: Toegang geweigerd
+ */
+
+
+/**
+ * @swagger
+ * /tasks:
+ *   post:
+ *     summary: Voeg een nieuwe taak toe
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project_id:
+ *                 type: integer
+ *                 description: Het ID van het project waaraan de taak is gekoppeld
+ *               title:
+ *                 type: string
+ *                 description: De titel van de taak
+ *               description:
+ *                 type: string
+ *                 description: De beschrijving van de taak
+ *               due_date:
+ *                 type: string
+ *                 format: date-time
+ *                 description: De deadline van de taak
+ *     responses:
+ *       201:
+ *         description: Taak succesvol toegevoegd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 taskId:
+ *                   type: integer
+ *                   description: Het ID van de nieuw toegevoegde taak
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende velden)
+ *       500:
+ *         description: Fout bij het toevoegen van de taak
+ */
+
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Verwijder een taak op basis van ID
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van de taak die verwijderd moet worden
+ *     responses:
+ *       200:
+ *         description: Taak succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Taak niet gevonden
+ *       500:
+ *         description: Fout bij het verwijderen van de taak
+ */
+
+
+/**
+ * @swagger
+ * /tasks:
+ *   get:
+ *     summary: Haal alle taken op die zijn toegewezen aan de ingelogde gebruiker
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Lijst met taken van de ingelogde gebruiker
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID van de taak
+ *                   project_id:
+ *                     type: integer
+ *                     description: ID van het project waaraan de taak is gekoppeld
+ *                   title:
+ *                     type: string
+ *                     description: Titel van de taak
+ *                   description:
+ *                     type: string
+ *                     description: Beschrijving van de taak
+ *                   status:
+ *                     type: string
+ *                     description: Status van de taak
+ *                   assigned_to:
+ *                     type: integer
+ *                     description: ID van de gebruiker aan wie de taak is toegewezen
+ *                   due_date:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Deadline van de taak
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Aanmaakdatum van de taak
+ *       500:
+ *         description: Fout bij het ophalen van taken
+ */
+
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   put:
+ *     summary: Update een bestaande taak op basis van ID
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van de taak die moet worden bijgewerkt
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Nieuwe titel van de taak
+ *               description:
+ *                 type: string
+ *                 description: Nieuwe beschrijving van de taak
+ *               due_date:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Nieuwe deadline van de taak
+ *               status:
+ *                 type: string
+ *                 description: Nieuwe status van de taak
+ *     responses:
+ *       200:
+ *         description: Taak succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende titel of beschrijving)
+ *       500:
+ *         description: Fout bij het bijwerken van de taak
+ */
+
+
+/**
+ * @swagger
+ * /profile:
+ *   get:
+ *     summary: Haal profielgegevens van de ingelogde gebruiker op
+ *     tags: [Gebruikers]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Profielgegevens succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       description: Naam van de gebruiker
+ *                     email:
+ *                       type: string
+ *                       description: E-mailadres van de gebruiker
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Datum waarop het profiel is aangemaakt
+ *                 tasks:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     description: Titels van taken toegewezen aan de gebruiker
+ *       404:
+ *         description: Gebruiker niet gevonden
+ *       500:
+ *         description: Fout bij het ophalen van profielgegevens of taken
+ */
+
+
+/**
+ * @swagger
+ * /projects:
+ *   get:
+ *     summary: Haal projecten op die zijn aangemaakt door de ingelogde gebruiker
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Lijst met projecten die door de gebruiker zijn aangemaakt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID van het project
+ *                   name:
+ *                     type: string
+ *                     description: Naam van het project
+ *                   description:
+ *                     type: string
+ *                     description: Beschrijving van het project
+ *       500:
+ *         description: Fout bij het ophalen van projecten
+ */
+
+
+/**
+ * @swagger
+ * /projects:
+ *   post:
+ *     summary: Maak een nieuw project aan
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Naam van het project
+ *               description:
+ *                 type: string
+ *                 description: Beschrijving van het project (optioneel)
+ *     responses:
+ *       201:
+ *         description: Project succesvol aangemaakt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 projectId:
+ *                   type: integer
+ *                   description: Het ID van het aangemaakte project
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende projectnaam)
+ *       500:
+ *         description: Fout bij het aanmaken van het project
+ */
+
+/**
+ * @swagger
+ * /projects/{id}:
+ *   put:
+ *     summary: Werk een bestaand project bij
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project dat moet worden bijgewerkt
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nieuwe naam van het project
+ *               description:
+ *                 type: string
+ *                 description: Nieuwe beschrijving van het project
+ *     responses:
+ *       200:
+ *         description: Project succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende projectnaam)
+ *       404:
+ *         description: Project niet gevonden
+ *       500:
+ *         description: Fout bij het bijwerken van het project
+ */
+
+
+/**
+ * @swagger
+ * /projects/{id}:
+ *   get:
+ *     summary: Haal gegevens van een specifiek project op
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project dat moet worden opgehaald
+ *     responses:
+ *       200:
+ *         description: Projectgegevens succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Het ID van het project
+ *                 name:
+ *                   type: string
+ *                   description: Naam van het project
+ *                 description:
+ *                   type: string
+ *                   description: Beschrijving van het project
+ *       404:
+ *         description: Project niet gevonden
+ *       500:
+ *         description: Fout bij het ophalen van projectgegevens
+ */
+
+
+/**
+ * @swagger
+ * /projects/{id}:
+ *   delete:
+ *     summary: Verwijder een specifiek project
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project dat moet worden verwijderd
+ *     responses:
+ *       200:
+ *         description: Project succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Project niet gevonden
+ *       500:
+ *         description: Fout bij het verwijderen van het project
+ */
+
+
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Haal een lijst van alle gebruikers op
+ *     tags: [Gebruikers]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Lijst van gebruikers succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: Het ID van de gebruiker
+ *                   name:
+ *                     type: string
+ *                     description: De naam van de gebruiker
+ *       500:
+ *         description: Fout bij het ophalen van gebruikers
+ */
+
+/**
+ * @swagger
+ * /project-members:
+ *   post:
+ *     summary: Voeg een nieuw lid toe aan een project
+ *     tags: [Projectleden]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: integer
+ *                 description: Het ID van de gebruiker die wordt toegevoegd aan het project
+ *               projectId:
+ *                 type: integer
+ *                 description: Het ID van het project waaraan de gebruiker wordt toegevoegd
+ *               role:
+ *                 type: string
+ *                 description: De rol van de gebruiker binnen het project
+ *     responses:
+ *       200:
+ *         description: Projectlid succesvol toegevoegd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 memberId:
+ *                   type: integer
+ *                   description: Het ID van het nieuw toegevoegde projectlid
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende velden)
+ *       500:
+ *         description: Fout bij het toevoegen van het projectlid
+ */
+
+
+/**
+ * @swagger
+ * /assigned-projects:
+ *   get:
+ *     summary: Haal alle projecten op waaraan de ingelogde gebruiker is toegewezen
+ *     tags: [Projecten]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     responses:
+ *       200:
+ *         description: Lijst met toegewezen projecten succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: Het ID van het project
+ *                   name:
+ *                     type: string
+ *                     description: De naam van het project
+ *                   description:
+ *                     type: string
+ *                     description: De beschrijving van het project
+ *       500:
+ *         description: Fout bij het ophalen van toegewezen projecten
+ */
+
+
+/**
+ * @swagger
+ * /project-tasks/{projectId}:
+ *   get:
+ *     summary: Haal alle taken op voor een specifiek project
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project waarvoor de taken moeten worden opgehaald
+ *     responses:
+ *       200:
+ *         description: Taken van het project succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID van de taak
+ *                   title:
+ *                     type: string
+ *                     description: Titel van de taak
+ *                   description:
+ *                     type: string
+ *                     description: Beschrijving van de taak
+ *                   status:
+ *                     type: string
+ *                     description: Status van de taak
+ *                   due_date:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Deadline van de taak
+ *       500:
+ *         description: Fout bij het ophalen van taken
+ */
+
+
+/**
+ * @swagger
+ * /project-role/{projectId}:
+ *   get:
+ *     summary: Haal de rol van de gebruiker op in een specifiek project
+ *     tags: [Projectleden]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project waarvan de rol moet worden opgehaald
+ *     responses:
+ *       200:
+ *         description: Rol van de gebruiker succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 role:
+ *                   type: string
+ *                   description: De rol van de gebruiker in het project
+ *       404:
+ *         description: Gebruikersrol niet gevonden
+ *       500:
+ *         description: Fout bij het ophalen van de gebruikersrol
+ */
+
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   get:
+ *     summary: Haal details op van een specifieke taak
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van de taak die moet worden opgehaald
+ *     responses:
+ *       200:
+ *         description: Details van de taak succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID van de taak
+ *                 title:
+ *                   type: string
+ *                   description: Titel van de taak
+ *                 description:
+ *                   type: string
+ *                   description: Beschrijving van de taak
+ *                 due_date:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Deadline van de taak
+ *                 status:
+ *                   type: string
+ *                   description: Status van de taak
+ *       404:
+ *         description: Taak niet gevonden
+ *       500:
+ *         description: Fout bij het ophalen van de taak
+ */
+
+
+/**
+ * @swagger
+ * /projects/{projectId}/members:
+ *   get:
+ *     summary: Haal alle leden van een specifiek project op
+ *     tags: [Projectleden]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project waarvan de leden moeten worden opgehaald
+ *     responses:
+ *       200:
+ *         description: Lijst van projectleden succesvol opgehaald
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID van de projectlid-relatie
+ *                   name:
+ *                     type: string
+ *                     description: Naam van de gebruiker
+ *                   role:
+ *                     type: string
+ *                     description: Rol van de gebruiker in het project
+ *       500:
+ *         description: Fout bij het ophalen van projectleden
+ */
+
+/**
+ * @swagger
+ * /projects/{projectId}/members/{memberId}:
+ *   delete:
+ *     summary: Verwijder een specifiek lid van een project
+ *     tags: [Projectleden]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het project waar het lid uit moet worden verwijderd
+ *       - in: path
+ *         name: memberId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van het projectlid dat moet worden verwijderd
+ *     responses:
+ *       200:
+ *         description: Projectlid succesvol verwijderd
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Projectlid niet gevonden
+ *       500:
+ *         description: Fout bij het verwijderen van het projectlid
+ */
+
+
+/**
+ * @swagger
+ * /profile:
+ *   put:
+ *     summary: Werk de profielgegevens van de ingelogde gebruiker bij
+ *     tags: [Gebruikers]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: De nieuwe naam van de gebruiker
+ *               email:
+ *                 type: string
+ *                 description: Het nieuwe e-mailadres van de gebruiker
+ *     responses:
+ *       200:
+ *         description: Profielgegevens succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende naam of email)
+ *       500:
+ *         description: Fout bij het bijwerken van de profielgegevens
+ */
+
+
+/**
+ * @swagger
+ * /tasks/{id}/status:
+ *   put:
+ *     summary: Werk de status van een specifieke taak bij
+ *     tags: [Taken]
+ *     security:
+ *       - bearerAuth: []  # Token authenticatie
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Het ID van de taak waarvan de status moet worden bijgewerkt
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: De nieuwe status van de taak
+ *     responses:
+ *       200:
+ *         description: Status van de taak succesvol bijgewerkt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validatiefout (bijvoorbeeld ontbrekende status)
+ *       500:
+ *         description: Fout bij het bijwerken van de status
+ */
+
+
 
 

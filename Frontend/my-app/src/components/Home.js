@@ -13,8 +13,7 @@ function Home() {
             navigate('/');
             return;
         }
-    
-        // Taken ophalen
+
         fetch('http://localhost:5000/tasks', {
             method: 'GET',
             headers: { Authorization: token },
@@ -22,39 +21,36 @@ function Home() {
             .then((response) => response.json())
             .then((data) => {
                 setTasks(data);
-                setFilteredTasks(data); // Toon alle taken standaard
+                setFilteredTasks(data);
             })
             .catch(() => {
                 console.error('Fout bij het ophalen van taken.');
                 navigate('/');
             });
-    
-        // Projecten ophalen
+
         fetch('http://localhost:5000/projects', {
             method: 'GET',
             headers: { Authorization: token },
         })
             .then((response) => response.json())
             .then((data) => {
-                setProjects(data); // Zet alleen de projecten
+                setProjects(data);
             })
             .catch(() => {
                 console.error('Fout bij het ophalen van projecten.');
                 setProjects([]);
             });
     }, [navigate]);
-    
-    
+
     const openEditPanel = (task) => {
         setSelectedTask(task);
         setIsEditing(true);
     };
-    
+
     const closeEditPanel = () => {
         setSelectedTask(null);
         setIsEditing(false);
     };
-    
 
     const handleSaveChanges = async () => {
         const token = localStorage.getItem('token');
@@ -84,12 +80,11 @@ function Home() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); // Verwijdert het opgeslagen token
-        navigate('/'); // Navigeert naar de loginpagina
+        localStorage.removeItem('token');
+        navigate('/');
     };
-    
-    const [projects, setProjects] = useState([]);
 
+    const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
 
     const handleSelectProject = (projectId) => {
@@ -97,7 +92,7 @@ function Home() {
         const tasksForProject = tasks.filter((task) => task.project_id === projectId);
         setFilteredTasks(tasksForProject);
     };
-    
+
     const [filteredTasks, setFilteredTasks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -110,20 +105,20 @@ function Home() {
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
     };
-    
+
     const handleDeleteProject = async () => {
         if (!selectedProject) {
             alert('Selecteer een project om te verwijderen.');
             return;
         }
-    
+
         const token = localStorage.getItem('token');
         const confirmDelete = window.confirm(
             'Weet je zeker dat je dit project wilt verwijderen? Dit kan niet ongedaan worden gemaakt.'
         );
-    
+
         if (!confirmDelete) return;
-    
+
         try {
             const response = await fetch(`http://localhost:5000/projects/${selectedProject}`, {
                 method: 'DELETE',
@@ -131,14 +126,13 @@ function Home() {
                     Authorization: token,
                 },
             });
-    
+
             if (response.ok) {
-                //alert('Project succesvol verwijderd!');
                 setProjects((prevProjects) =>
                     prevProjects.filter((project) => project.id !== selectedProject)
                 );
                 setSelectedProject(null);
-                setFilteredTasks([]); // Leeg de takenlijst
+                setFilteredTasks([]);
                 navigate('/home');
             } else {
                 const data = await response.json();
@@ -149,16 +143,16 @@ function Home() {
             alert('Er is een fout opgetreden. Probeer het opnieuw.');
         }
     };
-    
+
     const handleToggleStatus = async (taskId, currentStatus) => {
         const token = localStorage.getItem('token');
         if (!token) {
             alert('Je bent niet ingelogd.');
             return;
         }
-    
+
         const newStatus = currentStatus === 'pending' ? 'ended' : 'pending';
-    
+
         try {
             const response = await fetch(`http://localhost:5000/tasks/${taskId}/status`, {
                 method: 'PUT',
@@ -168,11 +162,11 @@ function Home() {
                 },
                 body: JSON.stringify({ status: newStatus }),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Fout bij het bijwerken van de status.');
             }
-    
+
             setTasks((prevTasks) =>
                 prevTasks.map((task) =>
                     task.id === taskId ? { ...task, status: newStatus } : task
@@ -183,12 +177,20 @@ function Home() {
             alert('Er is een fout opgetreden bij het bijwerken van de status.');
         }
     };
-    
-    
+
     return (
-        <div className="home-container">
+        <div className="home-container" style={{ display: 'flex', height: '100vh' }}>
             {/* Sidebar */}
-            <div className="sidebar">
+            <div
+                className="sidebar"
+                style={{
+                    width: '33.33%',
+                    backgroundColor: '#f8f9fa',
+                    padding: '20px',
+                    overflowY: 'auto',
+                    boxShadow: '2px 0 5px rgba(0, 0, 0, 0.1)',
+                }}
+            >
                 <button onClick={handleLogout}>Log Out</button>
                 <button onClick={() => navigate('/profile')}>Profiel</button>
                 <button
@@ -205,7 +207,6 @@ function Home() {
                     Toegewezen aan mij
                 </button>
 
-                   
                 <div>
                     <h3>Mijn Projecten</h3>
                     <input
@@ -221,7 +222,6 @@ function Home() {
                             borderRadius: '5px',
                         }}
                     />
-
                     <ul style={{ listStyle: 'none', padding: 0, marginTop: '10px' }}>
                         {filteredProjects.map((project) => (
                             <li
@@ -232,7 +232,8 @@ function Home() {
                                     padding: '10px',
                                     border: '1px solid #ddd',
                                     borderRadius: '5px',
-                                    backgroundColor: selectedProject === project.id ? '#e0e0e0' : '#f9f9f9',
+                                    backgroundColor:
+                                        selectedProject === project.id ? '#e0e0e0' : '#f9f9f9',
                                     cursor: 'pointer',
                                 }}
                             >
@@ -241,8 +242,6 @@ function Home() {
                             </li>
                         ))}
                     </ul>
-
-                    {/* Voeg project toe knop */}
                     <button
                         style={{
                             padding: '10px',
@@ -258,136 +257,152 @@ function Home() {
                     >
                         Voeg project toe
                     </button>
-
                 </div>
-   
-        
             </div>
 
             {/* Main Content */}
-            <div className="main-content">
-            <div style={{ position: 'relative' }}>
-                <button
-                    onClick={toggleDropdown}
-                    style={{
-                        position: 'absolute',
-                        top: '20px',
-                        right: '20px',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '24px',
-                        cursor: 'pointer',
-                    }}
-                >
-                    &#x22EE;
-                </button>
-                {isDropdownOpen && (
-                    <ul
+            <div
+                className="main-content"
+                style={{
+                    flex: 1,
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100vh',
+                    overflow: 'hidden',
+                }}
+            >
+                <div style={{ position: 'relative' }}>
+                    <button
+                        onClick={toggleDropdown}
                         style={{
                             position: 'absolute',
-                            top: '40px',
+                            top: '20px',
                             right: '20px',
-                            listStyle: 'none',
-                            padding: '10px',
-                            margin: 0,
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            borderRadius: '5px',
-                            zIndex: 10,
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '24px',
+                            cursor: 'pointer',
                         }}
                     >
-                        <li
-                            style={{ marginBottom: '10px', cursor: 'pointer' }}
-                            onClick={() => {
-                                if (selectedProject) {
-                                    navigate('/edit-project', { state: { projectId: selectedProject } });
-                                } else {
-                                    alert('Selecteer eerst een project om te bewerken.');
-                                }
+                        &#x22EE;
+                    </button>
+                    {isDropdownOpen && (
+                        <ul
+                            style={{
+                                position: 'absolute',
+                                top: '40px',
+                                right: '20px',
+                                listStyle: 'none',
+                                padding: '10px',
+                                margin: 0,
+                                backgroundColor: '#fff',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                borderRadius: '5px',
+                                zIndex: 10,
                             }}
                         >
-                            Bewerk project
-                        </li>
+                            <li
+                                style={{ marginBottom: '10px', cursor: 'pointer' }}
+                                onClick={() => {
+                                    if (selectedProject) {
+                                        navigate('/edit-project', {
+                                            state: { projectId: selectedProject },
+                                        });
+                                    } else {
+                                        alert('Selecteer eerst een project om te bewerken.');
+                                    }
+                                }}
+                            >
+                                Bewerk project
+                            </li>
+                            <li
+                                style={{ marginBottom: '10px', cursor: 'pointer' }}
+                                onClick={handleDeleteProject}
+                            >
+                                Verwijder project
+                            </li>
+                            <li
+                                style={{ marginBottom: '10px', cursor: 'pointer' }}
+                                onClick={() => {
+                                    if (selectedProject) {
+                                        navigate('/add-person', {
+                                            state: { projectId: selectedProject },
+                                        });
+                                    } else {
+                                        alert('Selecteer eerst een project om personen toe te voegen.');
+                                    }
+                                }}
+                            >
+                                Voeg persoon toe
+                            </li>
+                        </ul>
+                    )}
+                    <h1>My Tasks</h1>
+                </div>
 
-                        <li
-                            style={{ marginBottom: '10px', cursor: 'pointer' }}
-                            onClick={handleDeleteProject}
-                        >
-                            Verwijder project
-                        </li>
-
-                        <li
-                            style={{ marginBottom: '10px', cursor: 'pointer' }}
-                            onClick={() => {
-                                if (selectedProject) {
-                                    navigate('/add-person', { state: { projectId: selectedProject } });
-                                } else {
-                                    alert('Selecteer eerst een project om personen toe te voegen.');
-                                }
+                <div
+                    style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        overflowY: 'auto',
+                        paddingBottom: '20px',
+                    }}
+                >
+                    {filteredTasks.map((task) => (
+                        <div
+                            key={task.id}
+                            onClick={(e) => {
+                                if (e.target.type !== 'checkbox') openEditPanel(task);
+                            }}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                padding: '15px',
+                                border: '1px solid #ddd',
+                                borderRadius: '5px',
+                                backgroundColor: '#f9f9f9',
+                                textDecoration: task.status === 'ended' ? 'line-through' : 'none',
+                                opacity: task.status === 'ended' ? 0.6 : 1,
+                                cursor: 'pointer',
                             }}
                         >
-                            Voeg persoon toe
-                        </li>
+                            <div style={{ marginBottom: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={task.status === 'ended'}
+                                    onChange={() => handleToggleStatus(task.id, task.status)}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                <h3>{task.title}</h3>
+                                <p>{task.description}</p>
+                                <small>Deadline: {task.due_date || 'Geen'}</small>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-                    </ul>
-                )}
-                <h1>My Tasks</h1>
                 <button
                     style={{
                         position: 'fixed',
                         bottom: '20px',
                         right: '20px',
                         borderRadius: '50%',
-                        width: '50px',
-                        height: '50px',
+                        width: '60px',
+                        height: '60px',
                         fontSize: '24px',
                         backgroundColor: '#007bff',
                         color: '#fff',
                         border: 'none',
+                        cursor: 'pointer',
                     }}
-                    onClick={() => navigate('/add-task', { state: { projectId: selectedProject } })} // Geef projectId mee
+                    onClick={() => navigate('/add-task', { state: { projectId: selectedProject } })}
                 >
                     +
                 </button>
-            </div>
-
-
-                
-                <ul className="task-list">
-                    {filteredTasks.map((task) => (
-                        <li
-                            key={task.id}
-                            onClick={(e) => {
-                                if (e.target.type !== 'checkbox') openEditPanel(task);
-                            }} // Alleen de vierkant wordt geactiveerd als de checkbox niet wordt aangeklikt
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: '15px',
-                                marginBottom: '10px',
-                                border: '1px solid #ddd',
-                                borderRadius: '5px',
-                                backgroundColor: '#f9f9f9',
-                                cursor: 'pointer',
-                                textDecoration: task.status === 'ended' ? 'line-through' : 'none',
-                                opacity: task.status === 'ended' ? 0.6 : 1,
-                            }}
-                        >
-                            <input
-                                type="checkbox"
-                                checked={task.status === 'ended'}
-                                onChange={() => handleToggleStatus(task.id, task.status)}
-                                style={{ marginRight: '10px' }}
-                            />
-                            <div>
-                                <h3>{task.title}</h3>
-                                <p>{task.description}</p>
-                                <small>Deadline: {task.due_date || 'Geen'}</small>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
 
                 {isEditing && (
                     <>
@@ -423,14 +438,19 @@ function Home() {
                                 <input
                                     type="text"
                                     value={selectedTask.title}
-                                    onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
+                                    onChange={(e) =>
+                                        setSelectedTask({ ...selectedTask, title: e.target.value })
+                                    }
                                     style={{ width: '100%', marginBottom: '10px' }}
                                 />
                                 <label>Beschrijving:</label>
                                 <textarea
                                     value={selectedTask.description}
                                     onChange={(e) =>
-                                        setSelectedTask({ ...selectedTask, description: e.target.value })
+                                        setSelectedTask({
+                                            ...selectedTask,
+                                            description: e.target.value,
+                                        })
                                     }
                                     style={{ width: '100%', marginBottom: '10px' }}
                                 />
@@ -439,13 +459,16 @@ function Home() {
                                     type="date"
                                     value={selectedTask.due_date || ''}
                                     onChange={(e) =>
-                                        setSelectedTask({ ...selectedTask, due_date: e.target.value })
+                                        setSelectedTask({
+                                            ...selectedTask,
+                                            due_date: e.target.value,
+                                        })
                                     }
                                     style={{ width: '100%', marginBottom: '10px' }}
                                 />
                                 <button
                                     type="button"
-                                    onClick={handleSaveChanges} // Zorg dat de functie hier wordt aangeroepen
+                                    onClick={handleSaveChanges}
                                     style={{
                                         padding: '10px',
                                         borderRadius: '5px',
@@ -458,7 +481,6 @@ function Home() {
                                 >
                                     Opslaan
                                 </button>
-
                                 <button
                                     type="button"
                                     onClick={closeEditPanel}
@@ -473,45 +495,52 @@ function Home() {
                                     Annuleren
                                 </button>
                                 <button
-                                type="button"
-                                onClick={async () => {
-                                    const token = localStorage.getItem('token');
-                                    const response = await fetch(`http://localhost:5000/tasks/${selectedTask.id}`, {
-                                        method: 'DELETE',
-                                        headers: {
-                                            Authorization: token,
-                                        },
-                                    });
-
-                                    if (response.ok) {
-                                        setTasks((prevTasks) =>
-                                            prevTasks.filter((task) => task.id !== selectedTask.id)
+                                    type="button"
+                                    onClick={async () => {
+                                        const token = localStorage.getItem('token');
+                                        const response = await fetch(
+                                            `http://localhost:5000/tasks/${selectedTask.id}`,
+                                            {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    Authorization: token,
+                                                },
+                                            }
                                         );
-                                        setFilteredTasks((prevFilteredTasks) =>
-                                            prevFilteredTasks.filter((task) => task.id !== selectedTask.id)
-                                        );
-                                        closeEditPanel();
-                                    } else {
-                                        alert('Fout bij het verwijderen van de taak!');
-                                    }
-                                }}
-                                style={{
-                                    padding: '10px',
-                                    borderRadius: '5px',
-                                    border: 'none',
-                                    backgroundColor: '#dc3545',
-                                    color: '#fff',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                Verwijderen
-                            </button>
 
+                                        if (response.ok) {
+                                            setTasks((prevTasks) =>
+                                                prevTasks.filter(
+                                                    (task) => task.id !== selectedTask.id
+                                                )
+                                            );
+                                           
+
+                                            setFilteredTasks((prevFilteredTasks) =>
+                                                prevFilteredTasks.filter(
+                                                    (task) => task.id !== selectedTask.id
+                                                )
+                                            );
+                                            closeEditPanel();
+                                        } else {
+                                            alert('Fout bij het verwijderen van de taak!');
+                                        }
+                                    }}
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        border: 'none',
+                                        backgroundColor: '#dc3545',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Verwijderen
+                                </button>
                             </form>
                         </div>
                     </>
                 )}
-
             </div>
         </div>
     );
