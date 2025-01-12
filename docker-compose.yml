@@ -31,6 +31,6 @@ services:
     image: nouchka/sqlite3:latest
     volumes:
       - ./Database:/data
-    command: sqlite3 /database/Database.db
+    command: sqlite3 /data/Database.db
 
 
